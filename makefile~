@@ -1,0 +1,10 @@
+java:
+	javac *.java
+
+run:
+	javac *.java
+	java Test.java
+	
+clean:
+	rm *.class
+	rm *.*~
