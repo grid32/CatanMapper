@@ -5,12 +5,14 @@ public class Test
 {
 	public static void main(String[] args)
 	{
+		//Check params are input
 		if(args.length < 2)
 		{
 			System.out.println("Incorrect parameters.\n\tCorrect: java Test <height> <width>.");
 			return;
 		}
 		
+		//Validate params
 		int height, width;
 		try
 		{
@@ -23,8 +25,10 @@ public class Test
 			return;
 		}
 
+		//Create map
 		Map newMap = new Map(height, width);
 		
+		//Randomise
 		int i;
 		for(i = 0; i < newMap.getHeight(); i++)
 		{
@@ -38,6 +42,10 @@ public class Test
 			}
 		}
 		
+		//Display map in terminal
 		System.out.println(newMap.tostring());
+
+		//GUI
+		TileWindow tw = new TileWindow(newMap);
 	}
 }
