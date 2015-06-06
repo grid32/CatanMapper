@@ -1,10 +1,14 @@
+SRCDIR=src
+BINDIR=bin
+JAVASRCS=	Map.java Test.java Tile.java TileRow.java TileTest.java TileWindow.java
+
 java:
-	javac *.java
+	javac -d $(BINDIR)/ $(addprefix $(SRCDIR)/, $(JAVASRCS))
 
 run:
-	javac *.java
-	java Test 5 5
+	make java
+	java -classpath "bin/" Test 5 5
 	
 clean:
-	rm *.class
-	rm *.*~
+	rm $(BINDIR)/*.class
+	rm $(SRCDIR)/*~
