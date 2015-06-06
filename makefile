@@ -3,7 +3,7 @@ java:
 
 run:
 	javac *.java
-	java Test
+	java Test 5 5
 	
 clean:
 	rm *.class
