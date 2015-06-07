@@ -3,6 +3,7 @@ BINDIR=bin
 JAVASRCS=	Map.java Test.java Tile.java TileRow.java TileTest.java TileWindow.java
 
 java:
+	mkdir $(BINDIR)
 	javac -d $(BINDIR)/ $(addprefix $(SRCDIR)/, $(JAVASRCS))
 
 run:
