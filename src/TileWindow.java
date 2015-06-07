@@ -1,22 +1,49 @@
 import java.awt.image.BufferedImage;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.Random;
+import java.awt.Color;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.TexturePaint;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import javax.imageio.ImageIO;
+
+import java.io.File;
 
 public class TileWindow extends JFrame
 {
 	Map map;
+	BufferedImage[] bi;
 
 	public TileWindow(Map inMap)
 	{
 		map = inMap;
+
+		//Set up textures
+		bi = new BufferedImage[6];
+		String[] texFiles = {"Ocean.png", "Wood.png", "Ore.png", "Clay.png", "Sheep.png", "Wheat.png"};
+		for(int i = 0; i < bi.length; i++)
+		{
+			String imageURL = "res/" + texFiles[i];
+			try
+			{
+				bi[i] = ImageIO.read(new File(imageURL));
+			}
+			catch(Exception e)
+			{
+				System.out.println("Error: Tile texture file '" + imageURL + "' not found");
+			}
+		}
+		
+
 		BufferedImage surface = new BufferedImage(100 + (100*inMap.getWidth()),150 + (83*inMap.getHeight()),BufferedImage.TYPE_INT_RGB);
 		JLabel view = new JLabel(new ImageIcon(surface));
 		final Graphics g = surface.getGraphics();
 		g.setColor(Color.BLUE);
 		g.fillRect(0,0,100 + (100*inMap.getWidth()),150 + (83*inMap.getHeight()));
-		g.setColor(Color.BLACK);
 		g.dispose();
 
 		int x, y;
@@ -39,33 +66,61 @@ public class TileWindow extends JFrame
 
 	public void makeHex(BufferedImage inSurface, int inX, int inY)
 	{
-		Graphics g = inSurface.getGraphics();		
+		Graphics2D g = (Graphics2D)inSurface.getGraphics();
+		int typeID = map.getRow(inY).getHex(inX).getTypeID();
+		String rarity = "" + map.getRow(inY).getHex(inX).getRarity();
 
 		int diff = map.getWidth() - map.getRow(inY).getLength();
 		diff /= 2;
 		diff--;
 		inX += diff;
 
+		int x[] = new int[6];
+		int y[] = new int[6];
+
 		if(inY%2 == 0)
 		{
 			if((map.getHeight() + 1)%4 == 0)
 				inX += 1;
-			g.drawLine(100 + (100*inX), 100 + (83*inY), 150 + (100*inX), 66 + (83*inY)); //Top left
-			g.drawLine(150 + (100*inX), 66 + (83*inY), 200 + (100*inX), 100 + (83*inY)); //Top right
-			g.drawLine(200 + (100*inX), 100 + (83*inY), 200 + (100*inX), 150 + (83*inY)); //Right
-			g.drawLine(100 + (100*inX), 100 + (83*inY), 100 + (100*inX), 150 + (83*inY)); //Left
-			g.drawLine(100 + (100*inX), 150 + (83*inY), 150 + (100*inX), 183 + (83*inY)); //Bottom left
-			g.drawLine(150 + (100*inX), 183 + (83*inY), 200 + (100*inX), 150 + (83*inY)); //Bottom right
+			x[0] = 100 + (100*inX);			y[0] = 100 + (83*inY);
+			x[1] = 150 + (100*inX);			y[1] = 66 + (83*inY);
+			x[2] = 200 + (100*inX);			y[2] = 100 + (83*inY);
+			x[3] = 200 + (100*inX);			y[3] = 150 + (83*inY);
+			x[4] = 150 + (100*inX);			y[4] = 183 + (83*inY);
+			x[5] = 100 + (100*inX);			y[5] = 150 + (83*inY);
 		}
 		else
 		{
-			g.drawLine(150 + (100*inX), 100 + (83*inY), 200 + (100*inX), 66 + (83*inY)); //Top left
-			g.drawLine(200 + (100*inX), 66 + (83*inY), 250 + (100*inX), 100 + (83*inY)); //Top right
-			g.drawLine(250 + (100*inX), 100 + (83*inY), 250 + (100*inX), 150 + (83*inY)); //Right
-			g.drawLine(150 + (100*inX), 100 + (83*inY), 150 + (100*inX), 150 + (83*inY)); //Left
-			g.drawLine(150 + (100*inX), 150 + (83*inY), 200 + (100*inX), 183 + (83*inY)); //Bottom left
-			g.drawLine(200 + (100*inX), 183 + (83*inY), 250 + (100*inX), 150 + (83*inY)); //Bottom right
+			x[0] = 150 + (100*inX);			y[0] = 100 + (83*inY);
+			x[1] = 200 + (100*inX);			y[1] = 66 + (83*inY);
+			x[2] = 250 + (100*inX);			y[2] = 100 + (83*inY);
+			x[3] = 250 + (100*inX);			y[3] = 150 + (83*inY);
+			x[4] = 200 + (100*inX);			y[4] = 183 + (83*inY);
+			x[5] = 150 + (100*inX);			y[5] = 150 + (83*inY);
+		}		
+		
+		Polygon p = new Polygon(x, y, 6);
+		Rectangle r = p.getBounds();
+		BufferedImage tmp = new BufferedImage(r.width+2,r.height+2,BufferedImage.TYPE_INT_ARGB);
+		g.setClip(p);
+		if(bi[typeID] != null)
+		{
+			TexturePaint tex = new TexturePaint(bi[typeID], r);
+			g.setPaint(tex);
+			g.fill(p);
 		}
+		g.setColor(Color.BLACK);
+		g.drawPolygon(x, y, 6);
+
+		int centerX, centerY;
+		centerX = (x[2] + x[0]) / 2;
+		centerY = (y[4] + y[1]) / 2;
+		g.setColor(new Color(245, 237, 184));
+		g.fillOval(centerX-10, centerY-10, 20, 20);
+		g.setColor(Color.BLACK);
+		g.drawOval(centerX-10, centerY-10, 20, 20);
+
+		g.drawString(rarity, centerX-5, centerY+5);
 
 		g.dispose();
 	}

@@ -7,7 +7,7 @@ java:
 
 run:
 	make java
-	java -classpath "bin/" Test 5 5
+	java -classpath "bin/:res/" Test 5 5
 	
 clean:
 	rm $(BINDIR)/*.class
