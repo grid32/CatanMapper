@@ -13,6 +13,9 @@ import javax.imageio.ImageIO;
 
 import java.io.File;
 
+/** @brief 
+ ** @details 
+ **/
 public class TileWindow extends JFrame
 {
 	Map map;
@@ -23,8 +26,8 @@ public class TileWindow extends JFrame
 		map = inMap;
 
 		//Set up textures
-		bi = new BufferedImage[6];
-		String[] texFiles = {"Ocean.png", "Wood.png", "Ore.png", "Clay.png", "Sheep.png", "Wheat.png"};
+		bi = new BufferedImage[7];
+		String[] texFiles = {"Ocean.png", "Wood.png", "Ore.png", "Clay.png", "Sheep.png", "Wheat.png", "Desert.png"};
 		for(int i = 0; i < bi.length; i++)
 		{
 			String imageURL = "res/" + texFiles[i];

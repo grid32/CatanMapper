@@ -1,3 +1,8 @@
+import java.util.Random;
+
+/** @brief A completely random, vanilla map.
+ ** @details This is created using no constraints, other than that it is using only the 5 default resource tiles.
+ **/
 public class Map
 {
 	//Fields
@@ -5,15 +10,23 @@ public class Map
 	int 		maxWidth;
 	TileRow[] 	rows;
 	
-	//Default Constructor
+	/** @brief Default constructor for a TileRow.
+	 ** @details This generates a map of default size, 5x5. Initialises all tiles randomly as one of the 5 default resources.
+	 **/
 	public Map()
 	{
 		height = 5;
 		maxWidth = 5;
 		rows = new TileRow[height];
 		makeRows();
+		makeRandom();
 	}
 	
+	/** @brief Constructor for a TileRow.
+	 ** @details This generates a map of custom size. Initialises all tiles randomly as one of the 5 default resources.
+	 ** @param inHeight The height of the new Map.
+	 ** @param inWidth The width at the new Map's widest point.
+	 **/
 	public Map(int inHeight, int inWidth)
 	{
 		if(inHeight%2 == 0)
@@ -25,13 +38,18 @@ public class Map
 		maxWidth = inWidth;
 		rows = new TileRow[height];
 		makeRows();
+		makeRandom();
 	}
 	
 	//Getters
+	/** @brief
+	 ** @return
+	 **/
 	int 		getHeight()	 	{return height;}
+	
 	int 		getWidth()	 	{return maxWidth;}
 	TileRow[]	getRows() 		{return rows;}
-	TileRow		getRow(int inY)		{return rows[inY];}
+	TileRow		getRow(int inY)	{return rows[inY];}
 	
 	//Setters
 	
@@ -80,5 +98,22 @@ public class Map
 				out += "\n";
 		}
 		return out;
+	}
+
+	void makeRandom()
+	{
+		//Randomise
+		int i;
+		for(i = 0; i < this.getHeight(); i++)
+		{
+			int j;
+			for(j = 0; j < this.getRow(i).getLength(); j++)
+			{
+				Random rand = new Random();
+				int  n = rand.nextInt(5) + 1;
+
+				this.getRow(i).getHex(j).setTypeID(n);
+			}
+		}
 	}
 }

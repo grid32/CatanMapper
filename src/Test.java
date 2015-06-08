@@ -1,5 +1,4 @@
 import java.io.*;
-import java.util.Random;
 
 public class Test
 {
@@ -26,22 +25,8 @@ public class Test
 		}
 
 		//Create map
-		Map newMap = new Map(height, width);
-		
-		//Randomise
-		int i;
-		for(i = 0; i < newMap.getHeight(); i++)
-		{
-			int j;
-			for(j = 0; j < newMap.getRow(i).getLength(); j++)
-			{
-				Random rand = new Random();
-				int  n = rand.nextInt(5) + 1;
+		Map newMap = new EvenMap(height, width, 5);
 
-				newMap.getRow(i).getHex(j).setTypeID(n);
-			}
-		}
-		
 		//Display map in terminal
 		System.out.println(newMap.tostring());
 
