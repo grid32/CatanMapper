@@ -13,14 +13,20 @@ import javax.imageio.ImageIO;
 
 import java.io.File;
 
-/** @brief 
- ** @details 
+/** @brief A JFrame used to visualise a Map.
+ ** @details This involves first loading in all of the Tile's textures, then draws each hexagonal Tile, with its corresponding texture.
+ ** @field map The Map to be visualised.
+ ** @field bi An array of textures to be used.
  **/
 public class TileWindow extends JFrame
 {
 	Map map;
 	BufferedImage[] bi;
 
+	/** @brief The default constructor for a TileWindow.
+	 ** @details This loads all of the textures from file, sets up a drawing environment, and then calls makeHex() on each Tile.
+	 ** @param inMap The Map to be visualised.
+	 **/
 	public TileWindow(Map inMap)
 	{
 		map = inMap;
@@ -67,7 +73,14 @@ public class TileWindow extends JFrame
 		this.setVisible(true);
 	}
 
-	public void makeHex(BufferedImage inSurface, int inX, int inY)
+	/** @brief Draws a hexagon in the given area.
+	 ** @details This will drawing a hexagon at an appropriate point, with its corresponding texture. The point is calculated based on inX and inY, and the length of the TileRow.
+	 ** @param inSurface The area to draw the hexagon within.
+	 ** @param inX The X coordinate within the Map.
+	 ** @param inY The Y coordinate within the Map.
+	 ** @return void Returns nothing.
+	 **/
+	void makeHex(BufferedImage inSurface, int inX, int inY)
 	{
 		Graphics2D g = (Graphics2D)inSurface.getGraphics();
 		int typeID = map.getRow(inY).getHex(inX).getTypeID();

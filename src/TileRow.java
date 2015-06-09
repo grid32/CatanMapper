@@ -79,8 +79,8 @@ public class TileRow
 		return newHexes;
 	}
 	
-	/** @brief Builds a string of this TileRow.
-	 ** @details Makes a string of the typeID of each Tile in the TileRow, for use when displaying the text version of a Map.
+	/** @brief Builds a String of this TileRow.
+	 ** @details Makes a String of the typeID of each Tile in the TileRow, for use when displaying the text version of a Map.
 	 ** @return String Returns the String representation of this TileRow.
 	 **/
 	String tostring()
