@@ -12,17 +12,17 @@ public class EvenMap extends Map
 
 	/** @brief Default constructor for an EvenMap.
 	 ** @details This generates a map of default size, 5x5. Initialises all tiles, somewhat evenly, as one of the 5 default resources.
-	 ** @param inTypeCount The number of possible types to be used in this EvenMap.
 	 **/
-	public EvenMap(int inTypeCount)
+	public EvenMap()
 	{
-		height = 5;
-		maxWidth = 5;
-		rows = new TileRow[height];
-		makeRows();
+		super();
 
-		typeCount = inTypeCount;
+		typeCount = 5;
 		typeCounter = new int[typeCount];
+		for(int i = 0; i < typeCount; i++)
+		{
+			typeCounter[i] = 0;
+		}
 		makeRandom();
 	}
 
@@ -34,26 +34,14 @@ public class EvenMap extends Map
 	 **/
 	public EvenMap(int inHeight, int inWidth, int inTypeCount)
 	{
-		if(inHeight%2 == 0)
-		{
-			System.out.println("Error: Even height is not valid. Incrementing.");
-			inHeight++;
-		}
-		if(inWidth - (inHeight - 1)/2 < 1)
-		{
-			System.out.println("Error: Width is not sufficient for height. Incrementing.");
-			while(inWidth - (inHeight - 1)/2 < 1)
-			{
-				inWidth++;
-			}
-		}
-		height = inHeight;
-		maxWidth = inWidth;
-		rows = new TileRow[height];
-		makeRows();
+		super(inHeight, inWidth);
 
 		typeCount = inTypeCount;
 		typeCounter = new int[typeCount];
+		for(int i = 0; i < typeCount; i++)
+		{
+			typeCounter[i] = 0;
+		}
 		makeRandom();
 	}
 
@@ -91,7 +79,7 @@ public class EvenMap extends Map
 	}
 
 	/** @brief Prepares for randomising the EvenMap.
-	 ** @details This involves setting up the maxTypeCount, and initialising the confirmCount, then begins randomRecurse(). Once this is complete, sets the last Tile to a desert.
+	 ** @details Sets the typeIDs of each Tile a maximum number of times equal to 1/5th of the tileCount. Sets last tile as desert.
 	 ** @return void Returns nothing.
 	 **/
 	void makeRandom()
@@ -102,8 +90,37 @@ public class EvenMap extends Map
 		double maxTypeCount = (double)tileCount/(double)typeCount;
 		
 		int confirmCount = 0;
-		//Until confirmCount == tileCount;
-		randomRecurse(confirmCount, maxTypeCount);
+		boolean isFull = false;
+		while(confirmCount < tileCount && !isFull)
+		{
+			isFull = true;
+			for(int i = 0; i < typeCount; i++)
+			{
+				if(typeCounter[i] < maxTypeCount)
+					isFull = false;
+			}
+			if(!isFull)
+			{
+				Random rand = new Random();
+				int  randomType = rand.nextInt(typeCount); //Generate randomType
+				while(typeCounter[randomType] >= maxTypeCount) //While typeCounter[randomType] full
+				{
+					randomType = rand.nextInt(typeCount); //Generate randomType
+				}
+				int randomY = rand.nextInt(height);
+				int randomX = rand.nextInt(rows[randomY].length);
+				while(rows[randomY].getHex(randomX).getTypeID() != 0)
+				{
+					randomY = rand.nextInt(height);
+					randomX = rand.nextInt(rows[randomY].length);
+				}
+				rows[randomY].getHex(randomX).setTypeID(randomType + 1); //Place randomType at randomX randomY
+				typeCounter[randomType]++; //Increment typeCounter[random]
+				confirmCount++; //Increment confirmCount
+			}
+			if(isFull)
+				System.out.println("Error: Failed to set up EvenMap (during #" + confirmCount + ").");
+		}
 
 		//Fill last Tile with Desert.
 		for(int y = 0; y < rows.length; y++)
@@ -114,48 +131,5 @@ public class EvenMap extends Map
 					rows[y].getHex(x).setTypeID(6);
 			}
 		}
-	}
-
-	/** @brief Sets the EvenMap's typeIDs somewhat evenly.
-	 ** @details Sets the typeIDs of each Tile a maximum number of times equal to 1/5th of the tileCount.
-	 ** @param confirmCount The counter of how many nodes are correctly set.
-	 ** @param maxTypeCount The maximum number of occurences of a single type.
-	 ** @return void Returns nothing.
-	 **/
-	void randomRecurse(int confirmCount, double maxTypeCount)
-	{
-		//If typeCounter not full
-		boolean isFull = true;
-		for(int i = 0; i < typeCount; i++)
-		{
-			if(typeCounter[i] < maxTypeCount)
-				isFull = false;
-		}
-		if(!isFull)
-		{
-			Random rand = new Random();
-			int  randomType = rand.nextInt(typeCount); //Generate randomType
-			while(typeCounter[randomType] >= maxTypeCount) //While typeCounter[randomType] full
-			{
-				randomType = rand.nextInt(typeCount); //Generate randomType
-			}
-			int randomY = rand.nextInt(height);
-			int randomX = rand.nextInt(rows[randomY].length);
-			while(rows[randomY].getHex(randomX).getTypeID() != 0)
-			{
-				randomY = rand.nextInt(height);
-				randomX = rand.nextInt(rows[randomY].length);
-			}
-			rows[randomY].getHex(randomX).setTypeID(randomType + 1); //Place randomType at randomX randomY
-			typeCounter[randomType]++; //Increment typeCounter[random]
-			confirmCount++; //Increment confirmCount
-		}
-
-		if(confirmCount == (getTileCount() - 1))
-			return;
-		else if(isFull)
-			System.out.println("Error: Failed to set up EvenMap.");
-		else
-			randomRecurse(confirmCount, maxTypeCount);
 	}
 }

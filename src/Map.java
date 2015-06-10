@@ -22,7 +22,6 @@ public class Map
 		maxWidth = 5;
 		rows = new TileRow[height];
 		makeRows();
-		makeRandom();
 	}
 	
 	/** @brief Constructor for a Map.
@@ -49,7 +48,6 @@ public class Map
 		maxWidth = inWidth;
 		rows = new TileRow[height];
 		makeRows();
-		makeRandom();
 	}
 	
 	//Getters
