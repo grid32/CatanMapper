@@ -97,16 +97,23 @@ public class MainWindow extends JFrame
 		sizePanel.add(widthTxt, gbc);
 
 		/////////////////////////////////////////////
+		// Desert Chk							   //
+		/////////////////////////////////////////////
+		final JCheckBox desertChk = new JCheckBox("Desert");
+		changeGBC(0, 2, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
+		add(desertChk, gbc);
+
+		/////////////////////////////////////////////
 		// Player Panel							   //
 		/////////////////////////////////////////////
 		final JCheckBox playerHeadChk = new JCheckBox("6 Players");
-		changeGBC(0, 2, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
+		changeGBC(0, 3, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
 		add(playerHeadChk, gbc);
 
 		/////////////////////////////////////////////
 		// Seafarers Chk						   //
 		/////////////////////////////////////////////
-		changeGBC(0, 3, 3, 1, GridBagConstraints.WEST, 1, 0);
+		changeGBC(0, 4, 3, 1, GridBagConstraints.WEST, 1, 0);
 		final JCheckBox oceanChk = new JCheckBox("Seafarers");
 		add(oceanChk, gbc);
 
@@ -114,13 +121,13 @@ public class MainWindow extends JFrame
 		// Explorers Panel							   //
 		/////////////////////////////////////////////
 		final JCheckBox explorersHeadChk = new JCheckBox("Explorers & Pirates");
-		changeGBC(0, 4, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
+		changeGBC(0, 5, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
 		add(explorersHeadChk, gbc);
 		
 		final JPanel explorerPanel = new JPanel();
 		explorerPanel.setVisible(false);
 		explorerPanel.setLayout(new GridBagLayout());
-		changeGBC(0, 5, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
+		changeGBC(0, 6, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
 		add(explorerPanel, gbc);
 
 		explorersHeadChk.addItemListener(new ItemListener()
@@ -157,13 +164,13 @@ public class MainWindow extends JFrame
 		/////////////////////////////////////////////
 		// Spacing	 							   //
 		/////////////////////////////////////////////
-		changeGBC(0, 6, 3, 1, GridBagConstraints.NORTHWEST, 1, 1);
+		changeGBC(0, 7, 3, 1, GridBagConstraints.NORTHWEST, 1, 1);
 		add(new JPanel(), gbc);
 
 		/////////////////////////////////////////////
 		// GenerateBtn 							   //
 		/////////////////////////////////////////////
-		changeGBC(1, 7, 1, 1, GridBagConstraints.NORTHWEST, 1, 0);
+		changeGBC(1, 8, 1, 1, GridBagConstraints.NORTHWEST, 1, 0);
 		JButton generateBtn = new JButton("Generate");
 		generateBtn.addActionListener(new ActionListener()
 		{
@@ -248,6 +255,12 @@ public class MainWindow extends JFrame
 						outMap.splitLand(numberOfOceans);
 					}
 					MapNode first = new MapNode(outMap, 0, outMap.getTileCount(), outMap.getTypes());
+					
+					if(desertChk.isSelected())
+					{
+						outMap.placeDesert();
+					}
+
 					TileWindow tw = new TileWindow(outMap);
 				}
 				else

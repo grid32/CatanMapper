@@ -189,4 +189,20 @@ public class SpreadEvenMap extends Map
 			xY[1] += yMod;
 		}
 	}
+
+	/** @brief Places the desert Tile.
+	 ** @return void Returns nothing.
+	 **/
+	void placeDesert()
+	{
+		Random rand = new Random();
+		int tile = rand.nextInt(getTileCount());
+		int[] xY = getXY(tile);
+		while(getRow(xY[1]).getHex(xY[0]).getTypeID() < 1 || getRow(xY[1]).getHex(xY[0]).getTypeID() > 5)
+		{
+			tile = rand.nextInt(getTileCount());
+			xY = getXY(tile);
+		}
+		getRow(xY[1]).getHex(xY[0]).setTypeID(6);
+	}
 }
