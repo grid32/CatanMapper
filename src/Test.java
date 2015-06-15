@@ -25,7 +25,7 @@ public class Test
 		}
 
 		//Create map
-		Map newMap = new EvenMap(height, width, 5);
+		Map newMap = new SpreadEvenMap(height, width);
 
 		//Display map in terminal
 		System.out.println(newMap.tostring());

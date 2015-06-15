@@ -12,7 +12,7 @@ public class Tile
 	 **/
 	public Tile()
 	{
-		typeID = 0;
+		typeID = -1;
 		rarity = 0;
 	}
 	

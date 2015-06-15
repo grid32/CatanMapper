@@ -162,7 +162,6 @@ public class MainWindow extends JFrame
 			{
 				int outHeight = 5;
 				int outWidth = 5;
-				int[] outTypes = {1, 2, 3, 4, 5};
 
 				String errors = "";
 
@@ -206,18 +205,19 @@ public class MainWindow extends JFrame
 					{
 						if(!sizeHeadChk.isSelected())
 						{
-							outHeight = 7;
 							if(playerHeadChk.isSelected())
 							{
+								outHeight = 7;
 								outWidth = 9;
 							}
 							else
 							{
+								outHeight = 5;
 								outWidth = 7;
 							}
 						}
 					}
-					SpreadEvenMap outMap = new SpreadEvenMap(outHeight, outWidth, outTypes);
+					SpreadEvenMap outMap = new SpreadEvenMap(outHeight, outWidth);
 					if(oceanChk.isSelected())
 					{
 						int numberOfOceans;
@@ -236,7 +236,7 @@ public class MainWindow extends JFrame
 						{
 							numberOfOceans = 0;
 						}
-						outMap.tileOcean(numberOfOceans);
+						outMap.splitLand(numberOfOceans);
 					}
 					MapNode first = new MapNode(outMap, 0, outMap.getTileCount(), outMap.getTypes());
 					TileWindow tw = new TileWindow(outMap);

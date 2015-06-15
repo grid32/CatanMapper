@@ -150,4 +150,17 @@ public class Map
 			}
 		}
 	}
+
+	int getTileCount()
+	{
+		int count = 0;
+		for(int y = 0; y < rows.length; y++)
+		{
+			for(int x = 0; x < rows[y].length; x++)
+			{
+				count++;
+			}
+		}
+		return count;
+	}
 }

@@ -51,7 +51,7 @@ public class TileWindow extends JFrame
 		BufferedImage surface = new BufferedImage(100 + (100*inMap.getWidth()),150 + (83*inMap.getHeight()),BufferedImage.TYPE_INT_RGB);
 		JLabel view = new JLabel(new ImageIcon(surface));
 		final Graphics g = surface.getGraphics();
-		g.setColor(Color.BLUE);
+		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0,0,100 + (100*inMap.getWidth()),150 + (83*inMap.getHeight()));
 		g.dispose();
 
@@ -66,7 +66,6 @@ public class TileWindow extends JFrame
 			}
 		}
 
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setContentPane(view);
 		this.pack();
 		this.setLocationByPlatform(true);
@@ -119,7 +118,7 @@ public class TileWindow extends JFrame
 		Rectangle r = p.getBounds();
 		BufferedImage tmp = new BufferedImage(r.width+2,r.height+2,BufferedImage.TYPE_INT_ARGB);
 		g.setClip(p);
-		if(bi[typeID] != null)
+		if(typeID != -1 && bi[typeID] != null)
 		{
 			TexturePaint tex = new TexturePaint(bi[typeID], r);
 			g.setPaint(tex);
