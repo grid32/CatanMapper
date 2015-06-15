@@ -1,5 +1,7 @@
 import java.io.*;
 
+/** @brief Main function used to test a SpreadEvenMap.
+ **/
 public class Test
 {
 	public static void main(String[] args)

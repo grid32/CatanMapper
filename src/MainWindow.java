@@ -1,24 +1,33 @@
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.JButton;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.Exception;
+
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
+import java.lang.Exception;
+
+/** @brief A window to configure the new Map.
+ ** @details The window allows for selection of the number of players, which expansions to use, and custom sizing.
+ ** @field gbc The GridBagConstraints used for the placement of components within the window's GridBagLayout.
+ **/
 public class MainWindow extends JFrame
 {
 	GridBagConstraints gbc;
 
+	/** @brief Default constructor for a MainWindow.
+	 ** @details Draws all of the components for configuring the new Map.
+	 **/
 	public MainWindow()
 	{
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -253,6 +262,16 @@ public class MainWindow extends JFrame
 		this.setVisible(true);
 	}
 
+	/** @brief Functions to change values of the GridBagConstraints object.
+	 ** @param inX New X position in the GridBagLayout.
+	 ** @param inY New Y position in the GridBagLayout.
+	 ** @param inWidth Amount of cells wide to be in the GridBagLayout.
+	 ** @param inHeight Amount of cells tall to be in the GridBagLayout.
+	 ** @param inAnchor Edge to anchor to in the GridBagLayout.
+	 ** @param inWeightX The weighting used to determine how much of the space to claim when the window is resized, in the X-axis.
+	 ** @param inWeightY The weighting used to determine how much of the space to claim when the window is resized, in the Y-axis.
+	 ** @return void Returns nothing.
+	 **/
 	void changeGBC(int inX, int inY, int inWidth, int inHeight, int inAnchor, double inWeightX, double inWeightY) 
 	{
 		gbc.gridx = inX;
@@ -264,6 +283,12 @@ public class MainWindow extends JFrame
 		gbc.weighty = inWeightY;
 	}
 
+	/** @brief Shows or hides the input JPanel.
+	 ** @details This is used by the Listeners when further components are required.
+	 ** @param inPanel The JPanel to show/hide.
+	 ** @param inBool The new visibility state of the JPanel.
+	 ** @return void Returns nothing.
+	 **/
 	void setPanelVisibility(JPanel inPanel, boolean inBool)
 	{
 		inPanel.setVisible(inBool);

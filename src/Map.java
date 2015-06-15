@@ -14,7 +14,7 @@ public class Map
 	TileRow[] 	rows;
 	
 	/** @brief Default constructor for a Map.
-	 ** @details This generates a map of default size, 5x5. Initialises all tiles randomly as one of the 5 default resources.
+	 ** @details This generates a map of default size, 5x5. Initialises all tiles.
 	 **/
 	public Map()
 	{
@@ -25,7 +25,7 @@ public class Map
 	}
 	
 	/** @brief Constructor for a Map.
-	 ** @details This generates a Map of custom size. Initialises all tiles randomly as one of the 5 default resources.
+	 ** @details This generates a Map of custom size. Initialises all tiles.
 	 ** @param inHeight The height of the new Map.
 	 ** @param inWidth The width at the new Map's widest point.
 	 **/
@@ -151,6 +151,9 @@ public class Map
 		}
 	}
 
+	/** @brief Counts the number of tiles within the Map.
+	 ** @return int Returns the number of tiles within the Map.
+	 **/
 	int getTileCount()
 	{
 		int count = 0;

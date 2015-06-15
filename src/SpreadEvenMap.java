@@ -1,9 +1,18 @@
 import java.util.Random;
 
+/** @brief A Map where Tiles with like types are not neighboured.
+ ** @details This can be used for vanilla, seafarers, and their 6 player expansions.
+ ** @field types The array containing the vanilla Tile typeIDs.
+ **/
 public class SpreadEvenMap extends Map
 {
 	int[] types;
 
+	/** @brief Default constructor for a SpreadEvenMap.
+	 ** @details This generates a SpreadEvenMap of a specified size.
+	 ** @param inHeight The height of the new SpreadEvenMap.
+	 ** @param inWidth The width at the new SpreadEvenMap's widest point.
+	 **/
 	public SpreadEvenMap(int inHeight, int inWidth)
 	{
 		super(inHeight, inWidth);
@@ -12,11 +21,19 @@ public class SpreadEvenMap extends Map
 		types = tempTypes;
 	}
 
+	/** @brief Gets the list of typesIDs in use.
+	 ** @return int[] Returns the list of typeIDs.
+	 **/
 	int[] getTypes()
 	{
 		return types;
 	}
 
+	/** @brief Gets the X/Y coordinates of a Tile.
+	 ** @details This is done by iterating through the Map, until a count is reached matching the specified number.
+	 ** @param inIndex The count position of the Tile within the Map.
+	 ** @return int[] Returns the X and Y coordinate of the Tile contained in an array.
+	 **/
 	int[] getXY(int inIndex)
 	{
 		int[] xy = new int[2];
@@ -36,6 +53,12 @@ public class SpreadEvenMap extends Map
 		return xy;
 	}
 
+	/** @brief Checks the neighbours of a Tile for likeness.
+	 ** @details This checks the neighbours of a Tile based on the X/Y coordinate given, and decides how much change there should be of changing the specified Tile's typeID.
+	 ** @param inX The X coordinate of the Tile to be compared.
+	 ** @param inY The Y coordinate of the Tile to be compared.
+	 ** @return int Returns the chance of changing the Tile's typeID.
+	 **/
 	int checkNeighbours(int inX, int inY)
 	{
 		int myType = rows[inY].getHex(inX).getTypeID();
@@ -89,34 +112,11 @@ public class SpreadEvenMap extends Map
 		return (int) chance;
 	}
 
-	void tileOcean(int currentCount, int oceanCount)
-	{
-		Random rand = new Random();
-		int tile = rand.nextInt(getTileCount()); //Start at random point
-		int[] xY = getXY(tile);
-
-		while(currentCount < oceanCount)
-		{
-			if(getRow(xY[1]).getHex(xY[0]).getTypeID() != 0)
-			{
-				getRow(xY[1]).getHex(xY[0]).setTypeID(0); //Make tile ocean.
-				currentCount++;
-			}
-			int xMod = rand.nextInt(3)-1;
-			int yMod = rand.nextInt(3)-1;
-			while(rows.length - 1 < xY[1] + yMod || xY[1] + yMod < 0) //Move in random direction.
-			{
-				yMod = rand.nextInt(3)-1;
-			}
-			while(rows[xY[1] + yMod].length - 1 < xY[0] + xMod || xY[0] + xMod < 0)
-			{
-				xMod = rand.nextInt(3)-1;
-			}
-			xY[0] += xMod;
-			xY[1] += yMod;
-		}
-	}
-
+	/** @brief Initiates seafarers ocean placement.
+	 ** @details This is done by drawing a jagged ocean line down the center of the Map.
+	 ** @param oceanCount The number of Tiles to make ocean.
+	 ** @return void Returns nothing.
+	 **/
 	void splitLand(int oceanCount)
 	{
 		Random rand = new Random();
@@ -154,5 +154,39 @@ public class SpreadEvenMap extends Map
 			i++;
 		}
 		tileOcean(currentCount, oceanCount); //Call next part(currentCount, oceanCount);
+	}
+
+	/** @brief Finalises seafarers ocean placement.
+	 ** @details This is done by picking a random Tile, making it ocean, and stepping randomly until complete.
+	 ** @param currentCount The number of Tiles already made ocean by splitLand().
+	 ** @param oceanCount The number of Tiles to make ocean.
+	 ** @return void Returns nothing.
+	 **/
+	void tileOcean(int currentCount, int oceanCount)
+	{
+		Random rand = new Random();
+		int tile = rand.nextInt(getTileCount()); //Start at random point
+		int[] xY = getXY(tile);
+
+		while(currentCount < oceanCount)
+		{
+			if(getRow(xY[1]).getHex(xY[0]).getTypeID() != 0)
+			{
+				getRow(xY[1]).getHex(xY[0]).setTypeID(0); //Make tile ocean.
+				currentCount++;
+			}
+			int xMod = rand.nextInt(3)-1;
+			int yMod = rand.nextInt(3)-1;
+			while(rows.length - 1 < xY[1] + yMod || xY[1] + yMod < 0) //Move in random direction.
+			{
+				yMod = rand.nextInt(3)-1;
+			}
+			while(rows[xY[1] + yMod].length - 1 < xY[0] + xMod || xY[0] + xMod < 0)
+			{
+				xMod = rand.nextInt(3)-1;
+			}
+			xY[0] += xMod;
+			xY[1] += yMod;
+		}
 	}
 }
