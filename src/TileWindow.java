@@ -83,12 +83,12 @@ public class TileWindow extends JFrame
 				{
 					//Resize and redraw.
 					Dimension d = temp.getContentPane().getSize();
-					BufferedImage resizedImg = new BufferedImage((int)d.getWidth(), (int)d.getHeight(), BufferedImage.TYPE_INT_ARGB);
-					Graphics2D g2 = resizedImg.createGraphics();
-					g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-					g2.drawImage(surface, 0, 0, (int)d.getWidth(), (int)d.getHeight(), null);
-					g2.dispose();
-					view.setIcon(new ImageIcon(resizedImg));
+					BufferedImage resizedSurface = new BufferedImage((int)d.getWidth(), (int)d.getHeight(), BufferedImage.TYPE_INT_ARGB);
+					Graphics2D gR = resizedSurface.createGraphics();
+					gR.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+					gR.drawImage(surface, 0, 0, (int)d.getWidth(), (int)d.getHeight(), null);
+					gR.dispose();
+					view.setIcon(new ImageIcon(resizedSurface));
 					view.repaint();
 					temp.pack();
 				}
@@ -108,38 +108,41 @@ public class TileWindow extends JFrame
 		int typeID = map.getRow(inY).getHex(inX).getTypeID();
 		String rarity = "" + map.getRow(inY).getHex(inX).getRarity();
 
-		int diff = map.getWidth() - map.getRow(inY).getLength();
+		//Check how much to pad based on width of current row.
+		double diff = map.getWidth() - map.getRow(inY).getLength();
 		diff /= 2;
-		diff--;
 		inX += diff;
 
-		int x[] = new int[6];
-		int y[] = new int[6];
-
-		if(inY%2 == 0)
+		//Pad based on whether it's an "in-between" row.
+		double tempX = inX;
+		if((map.getHeight() + 1)%4 == 0)
 		{
-			if((map.getHeight() + 1)%4 == 0)
-				inX += 1;
-			x[0] = 100 + (100*inX);			y[0] = 100 + (83*inY);
-			x[1] = 150 + (100*inX);			y[1] = 66 + (83*inY);
-			x[2] = 200 + (100*inX);			y[2] = 100 + (83*inY);
-			x[3] = 200 + (100*inX);			y[3] = 150 + (83*inY);
-			x[4] = 150 + (100*inX);			y[4] = 183 + (83*inY);
-			x[5] = 100 + (100*inX);			y[5] = 150 + (83*inY);
+			if(inY%2 != 0)
+			{
+				tempX -= 0.5;
+			}
 		}
 		else
 		{
-			x[0] = 150 + (100*inX);			y[0] = 100 + (83*inY);
-			x[1] = 200 + (100*inX);			y[1] = 66 + (83*inY);
-			x[2] = 250 + (100*inX);			y[2] = 100 + (83*inY);
-			x[3] = 250 + (100*inX);			y[3] = 150 + (83*inY);
-			x[4] = 200 + (100*inX);			y[4] = 183 + (83*inY);
-			x[5] = 150 + (100*inX);			y[5] = 150 + (83*inY);
-		}		
+			if(inY%2 == 0)
+			{
+				tempX -= 0.5;
+			}
+		}
+
+		//Points list for polygon drawing.
+		int x[] = new int[6];
+		int y[] = new int[6];
+		x[0] = 100 + (int) (100*tempX);			y[0] = 100 + (83*inY);
+		x[1] = 150 + (int) (100*tempX);			y[1] = 66 + (83*inY);
+		x[2] = 200 + (int) (100*tempX);			y[2] = 100 + (83*inY);
+		x[3] = 200 + (int) (100*tempX);			y[3] = 150 + (83*inY);
+		x[4] = 150 + (int) (100*tempX);			y[4] = 183 + (83*inY);
+		x[5] = 100 + (int) (100*tempX);			y[5] = 150 + (83*inY);	
 		
 		Polygon p = new Polygon(x, y, 6);
 		Rectangle r = p.getBounds();
-		BufferedImage tmp = new BufferedImage(r.width+2,r.height+2,BufferedImage.TYPE_INT_ARGB);
+		BufferedImage tmp = new BufferedImage(r.width + 2,r.height + 2,BufferedImage.TYPE_INT_ARGB);
 		g.setClip(p);
 		if(typeID != -1 && bi[typeID] != null)
 		{
@@ -148,7 +151,7 @@ public class TileWindow extends JFrame
 			g.fill(p);
 		}
 		g.setColor(Color.BLACK);
-		g.drawPolygon(x, y, 6);
+		//g.drawPolygon(x, y, 6);
 
 		int centerX, centerY;
 		centerX = (x[2] + x[0]) / 2;
