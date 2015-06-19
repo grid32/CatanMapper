@@ -5,11 +5,16 @@ import java.awt.Rectangle;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.TexturePaint;
+import java.awt.RenderingHints;
+import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.imageio.ImageIO;
+
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import java.io.File;
 
@@ -48,9 +53,8 @@ public class TileWindow extends JFrame
 		}
 		
 
-		BufferedImage surface = new BufferedImage(100 + (100*inMap.getWidth()),150 + (83*inMap.getHeight()),BufferedImage.TYPE_INT_RGB);
-		JLabel view = new JLabel(new ImageIcon(surface));
-		final Graphics g = surface.getGraphics();
+		final BufferedImage surface = new BufferedImage(100 + (100*inMap.getWidth()),150 + (83*inMap.getHeight()),BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = (Graphics2D) surface.getGraphics();
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0,0,100 + (100*inMap.getWidth()),150 + (83*inMap.getHeight()));
 		g.dispose();
@@ -62,14 +66,33 @@ public class TileWindow extends JFrame
 			for(x = 0; x < row.getLength(); x++)
 			{
 					makeHex(surface, x, y);
-					view.repaint();
 			}
 		}
+
+		final JLabel view = new JLabel(new ImageIcon(surface));
 
 		this.setContentPane(view);
 		this.pack();
 		this.setLocationByPlatform(true);
 		this.setVisible(true);
+
+		final JFrame temp = this;
+		this.addComponentListener(new ComponentAdapter()
+		{
+				public void componentResized(ComponentEvent evt) 
+				{
+					//Resize and redraw.
+					Dimension d = temp.getContentPane().getSize();
+					BufferedImage resizedImg = new BufferedImage((int)d.getWidth(), (int)d.getHeight(), BufferedImage.TYPE_INT_ARGB);
+					Graphics2D g2 = resizedImg.createGraphics();
+					g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+					g2.drawImage(surface, 0, 0, (int)d.getWidth(), (int)d.getHeight(), null);
+					g2.dispose();
+					view.setIcon(new ImageIcon(resizedImg));
+					view.repaint();
+					temp.pack();
+				}
+		});
 	}
 
 	/** @brief Draws a hexagon in the given area.

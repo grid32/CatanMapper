@@ -14,6 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JComponent;
 
 import java.lang.Exception;
 
@@ -41,7 +42,7 @@ public class MainWindow extends JFrame
 		gbc.insets = new Insets(5, 5, 5, 5);
 
 		/////////////////////////////////////////////
-		// Size Panel						   //
+		// Size Panel							   //
 		/////////////////////////////////////////////
 		final JCheckBox sizeHeadChk = new JCheckBox("Custom Size");
 		changeGBC(0, 0, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
@@ -52,21 +53,6 @@ public class MainWindow extends JFrame
 		sizePanel.setLayout(new GridBagLayout());
 		changeGBC(0, 1, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
 		add(sizePanel, gbc);
-
-		sizeHeadChk.addItemListener(new ItemListener()
-		{
-			public void itemStateChanged(ItemEvent e)
-			{
-				if(e.getStateChange() == ItemEvent.SELECTED)
-				{
-					setPanelVisibility(sizePanel, true);
-				}
-				else
-				{
-					setPanelVisibility(sizePanel, false);
-				}
-			}
-		});
 
 		/////////////////////////////////////////////
 		// HeightTxt 							   //
@@ -106,9 +92,27 @@ public class MainWindow extends JFrame
 		/////////////////////////////////////////////
 		// Player Panel							   //
 		/////////////////////////////////////////////
-		final JCheckBox playerHeadChk = new JCheckBox("6 Players");
+		final JCheckBox playerChk = new JCheckBox("6 Players");
 		changeGBC(0, 3, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
-		add(playerHeadChk, gbc);
+		add(playerChk, gbc);
+
+		sizeHeadChk.addItemListener(new ItemListener()
+		{
+			public void itemStateChanged(ItemEvent e)
+			{
+				if(e.getStateChange() == ItemEvent.SELECTED)
+				{
+					setComponentVisibility(sizePanel, true);
+					playerChk.setEnabled(false);
+					playerChk.setSelected(false);
+				}
+				else
+				{
+					setComponentVisibility(sizePanel, false);
+					playerChk.setEnabled(true);
+				}
+			}
+		});
 
 		/////////////////////////////////////////////
 		// Seafarers Chk						   //
@@ -136,11 +140,11 @@ public class MainWindow extends JFrame
 			{
 				if(e.getStateChange() == ItemEvent.SELECTED)
 				{
-					setPanelVisibility(explorerPanel, true);
+					setComponentVisibility(explorerPanel, true);
 				}
 				else
 				{
-					setPanelVisibility(explorerPanel, false);
+					setComponentVisibility(explorerPanel, false);
 				}
 			}
 		});
@@ -181,7 +185,7 @@ public class MainWindow extends JFrame
 
 				String errors = "";
 
-				if(playerHeadChk.isSelected())
+				if(playerChk.isSelected())
 				{
 					outHeight = 5;
 					outWidth = 7;
@@ -221,7 +225,7 @@ public class MainWindow extends JFrame
 					{
 						if(!sizeHeadChk.isSelected())
 						{
-							if(playerHeadChk.isSelected())
+							if(playerChk.isSelected())
 							{
 								outHeight = 7;
 								outWidth = 9;
@@ -239,7 +243,7 @@ public class MainWindow extends JFrame
 						int numberOfOceans;
 						if(!sizeHeadChk.isSelected())
 						{
-							if(playerHeadChk.isSelected())
+							if(playerChk.isSelected())
 							{
 								numberOfOceans = outMap.getTileCount() - 29;
 							}
@@ -250,7 +254,7 @@ public class MainWindow extends JFrame
 						}
 						else
 						{
-							numberOfOceans = 0;
+							numberOfOceans = outMap.getTileCount() / 3;
 						}
 						outMap.splitLand(numberOfOceans);
 					}
@@ -296,15 +300,15 @@ public class MainWindow extends JFrame
 		gbc.weighty = inWeightY;
 	}
 
-	/** @brief Shows or hides the input JPanel.
+	/** @brief Shows or hides the input JComponent.
 	 ** @details This is used by the Listeners when further components are required.
-	 ** @param inPanel The JPanel to show/hide.
-	 ** @param inBool The new visibility state of the JPanel.
+	 ** @param inComponent The JComponent to show/hide.
+	 ** @param inBool The new visibility state of the JComponent.
 	 ** @return void Returns nothing.
 	 **/
-	void setPanelVisibility(JPanel inPanel, boolean inBool)
+	void setComponentVisibility(JComponent inComponent, boolean inBool)
 	{
-		inPanel.setVisible(inBool);
+		inComponent.setVisible(inBool);
 		this.pack();
 	}
 }
