@@ -187,8 +187,8 @@ public class MainWindow extends JFrame
 
 				if(playerChk.isSelected())
 				{
-					outHeight = 5;
-					outWidth = 7;
+					outHeight = 7;
+					outWidth = 6;
 				}
 
 				if(sizeHeadChk.isSelected())
@@ -228,12 +228,12 @@ public class MainWindow extends JFrame
 							if(playerChk.isSelected())
 							{
 								outHeight = 7;
-								outWidth = 9;
+								outWidth = 10;
 							}
 							else
 							{
-								outHeight = 5;
-								outWidth = 7;
+								outHeight = 7;
+								outWidth = 8;
 							}
 						}
 					}
@@ -245,11 +245,11 @@ public class MainWindow extends JFrame
 						{
 							if(playerChk.isSelected())
 							{
-								numberOfOceans = outMap.getTileCount() - 29;
+								numberOfOceans = 18;
 							}
 							else
 							{
-								numberOfOceans = outMap.getTileCount() - 19;
+								numberOfOceans = 16;
 							}
 						}
 						else
