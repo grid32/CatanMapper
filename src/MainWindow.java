@@ -6,6 +6,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -15,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JComponent;
+import javax.swing.JSlider;
 
 import java.lang.Exception;
 
@@ -41,18 +44,48 @@ public class MainWindow extends JFrame
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(5, 5, 5, 5);
 
+		final JCheckBox sizeChk = new JCheckBox();
+		final JPanel sizePanel = new JPanel();
+			final JTextField heightTxt = new JTextField();
+			final JTextField widthTxt = new JTextField();
+		final JCheckBox desertChk = new JCheckBox();
+		final JPanel desertPanel = new JPanel();
+			final JSlider desertSld = new JSlider(1, 1, 1);
+			final JLabel desertLbl = new JLabel();
+		final JCheckBox playerChk = new JCheckBox();
+		final JCheckBox oceanChk = new JCheckBox();
+		final JCheckBox explorersChk = new JCheckBox();
+		final JPanel explorerPanel = new JPanel();
+			final JCheckBox sunChk = new JCheckBox();
+			final JCheckBox moonChk = new JCheckBox();
+		final JButton generateBtn = new JButton();
+
+
 		/////////////////////////////////////////////
 		// Size Panel							   //
 		/////////////////////////////////////////////
-		final JCheckBox sizeHeadChk = new JCheckBox("Custom Size");
+		sizeChk.setText("Custom Size");
 		changeGBC(0, 0, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
-		add(sizeHeadChk, gbc);
+		add(sizeChk, gbc);
 		
-		final JPanel sizePanel = new JPanel();
 		sizePanel.setVisible(false);
 		sizePanel.setLayout(new GridBagLayout());
 		changeGBC(0, 1, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
 		add(sizePanel, gbc);
+		sizeChk.addItemListener(new ItemListener()
+		{
+			public void itemStateChanged(ItemEvent e)
+			{
+				if(e.getStateChange() == ItemEvent.SELECTED)
+				{
+					setComponentVisibility(sizePanel, true);
+				}
+				else
+				{
+					setComponentVisibility(sizePanel, false);
+				}
+			}
+		});
 
 		/////////////////////////////////////////////
 		// HeightTxt 							   //
@@ -63,7 +96,6 @@ public class MainWindow extends JFrame
 		changeGBC(1, 0, 1, 1, GridBagConstraints.NORTHWEST, 1, 1);
 		sizePanel.add(new JPanel(), gbc);
 
-		final JTextField heightTxt = new JTextField();
 		heightTxt.setPreferredSize(new Dimension(50, 20));
 		changeGBC(2, 0, 1, 1, GridBagConstraints.EAST, 0, 0);
 		sizePanel.add(heightTxt, gbc);
@@ -77,7 +109,6 @@ public class MainWindow extends JFrame
 		changeGBC(1, 1, 1, 1, GridBagConstraints.NORTHWEST, 1, 1);
 		sizePanel.add(new JPanel(), gbc);
 
-		final JTextField widthTxt = new JTextField();
 		widthTxt.setPreferredSize(new Dimension(50, 20));
 		changeGBC(2, 1, 1, 1, GridBagConstraints.EAST, 0, 0);
 		sizePanel.add(widthTxt, gbc);
@@ -85,56 +116,90 @@ public class MainWindow extends JFrame
 		/////////////////////////////////////////////
 		// Desert Chk							   //
 		/////////////////////////////////////////////
-		final JCheckBox desertChk = new JCheckBox("Desert");
+		desertChk.setText("Desert");
 		changeGBC(0, 2, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
 		add(desertChk, gbc);
 
-		/////////////////////////////////////////////
-		// Player Panel							   //
-		/////////////////////////////////////////////
-		final JCheckBox playerChk = new JCheckBox("6 Players");
+		desertPanel.setVisible(false);
+		desertPanel.setLayout(new GridBagLayout());
 		changeGBC(0, 3, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
-		add(playerChk, gbc);
+		add(desertPanel, gbc);
 
-		sizeHeadChk.addItemListener(new ItemListener()
+		updateDesertSld(desertSld, playerChk.isSelected(), oceanChk.isSelected());
+
+		desertChk.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent e)
 			{
 				if(e.getStateChange() == ItemEvent.SELECTED)
 				{
-					setComponentVisibility(sizePanel, true);
-					playerChk.setEnabled(false);
-					playerChk.setSelected(false);
+					setComponentVisibility(desertPanel, true);
 				}
 				else
 				{
-					setComponentVisibility(sizePanel, false);
-					playerChk.setEnabled(true);
+					setComponentVisibility(desertPanel, false);
 				}
+			}
+		});
+
+		/////////////////////////////////////////////
+		// DesertSld 							   //
+		/////////////////////////////////////////////
+		changeGBC(0, 0, 1, 1, GridBagConstraints.WEST, 1, 0);
+		desertPanel.add(desertSld, gbc);
+		desertSld.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				desertLbl.setText("" + desertSld.getValue());
+			}
+		});
+
+		changeGBC(1, 0, 1, 1, GridBagConstraints.WEST, 0, 0);
+		desertLbl.setText("" + desertSld.getValue());
+		desertPanel.add(desertLbl, gbc);
+
+		/////////////////////////////////////////////
+		// Player Panel							   //
+		/////////////////////////////////////////////
+		playerChk.setText("6 Players");
+		changeGBC(0, 4, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
+		add(playerChk, gbc);
+		playerChk.addItemListener(new ItemListener()
+		{
+			public void itemStateChanged(ItemEvent e)
+			{
+				updateDesertSld(desertSld, playerChk.isSelected(), oceanChk.isSelected());
 			}
 		});
 
 		/////////////////////////////////////////////
 		// Seafarers Chk						   //
 		/////////////////////////////////////////////
-		changeGBC(0, 4, 3, 1, GridBagConstraints.WEST, 1, 0);
-		final JCheckBox oceanChk = new JCheckBox("Seafarers");
+		changeGBC(0, 5, 3, 1, GridBagConstraints.WEST, 1, 0);
+		oceanChk.setText("Seafarers");
 		add(oceanChk, gbc);
+		oceanChk.addItemListener(new ItemListener()
+		{
+			public void itemStateChanged(ItemEvent e)
+			{
+				updateDesertSld(desertSld, playerChk.isSelected(), oceanChk.isSelected());
+			}
+		});
 
 		/////////////////////////////////////////////
 		// Explorers Panel							   //
 		/////////////////////////////////////////////
-		final JCheckBox explorersHeadChk = new JCheckBox("Explorers & Pirates");
-		changeGBC(0, 5, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
-		add(explorersHeadChk, gbc);
+		explorersChk.setText("Explorers & Pirates");
+		changeGBC(0, 6, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
+		add(explorersChk, gbc);
 		
-		final JPanel explorerPanel = new JPanel();
 		explorerPanel.setVisible(false);
 		explorerPanel.setLayout(new GridBagLayout());
-		changeGBC(0, 6, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
+		changeGBC(0, 7, 3, 1, GridBagConstraints.NORTHWEST, 1, 0);
 		add(explorerPanel, gbc);
 
-		explorersHeadChk.addItemListener(new ItemListener()
+		explorersChk.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent e)
 			{
@@ -153,7 +218,7 @@ public class MainWindow extends JFrame
 		// Suns		 							   //
 		/////////////////////////////////////////////
 		changeGBC(0, 0, 1, 1, GridBagConstraints.WEST, 1, 0);
-		final JCheckBox sunChk = new JCheckBox("Suns");
+		sunChk.setText("Suns");
 		sunChk.setSelected(true);
 		explorerPanel.add(sunChk, gbc);
 
@@ -161,37 +226,81 @@ public class MainWindow extends JFrame
 		// Moons	 							   //
 		/////////////////////////////////////////////
 		changeGBC(0, 1, 1, 1, GridBagConstraints.WEST, 1, 0);
-		final JCheckBox moonChk = new JCheckBox("Moons");
+		moonChk.setText("Moons");
 		moonChk.setSelected(true);
 		explorerPanel.add(moonChk, gbc);
 
 		/////////////////////////////////////////////
 		// Spacing	 							   //
 		/////////////////////////////////////////////
-		changeGBC(0, 7, 3, 1, GridBagConstraints.NORTHWEST, 1, 1);
+		changeGBC(0, 8, 3, 1, GridBagConstraints.NORTHWEST, 1, 1);
 		add(new JPanel(), gbc);
 
 		/////////////////////////////////////////////
 		// GenerateBtn 							   //
 		/////////////////////////////////////////////
-		changeGBC(1, 8, 1, 1, GridBagConstraints.NORTHWEST, 1, 0);
-		JButton generateBtn = new JButton("Generate");
+		changeGBC(1, 9, 1, 1, GridBagConstraints.NORTHWEST, 1, 0);
+		generateBtn.setText("Generate");
 		generateBtn.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				/////////////////////////////////////
+				// Set up tile counts			   //
+				/////////////////////////////////////
 				int outHeight = 5;
 				int outWidth = 5;
+				int maxTileCount = 19;
+				if(!desertChk.isSelected())
+					{
+						maxTileCount = 18;
+					}
+				int numberOfOceans = 0;
 
 				String errors = "";
 
+				//Vanilla
 				if(playerChk.isSelected())
 				{
 					outHeight = 7;
-					outWidth = 6;
+					outWidth  = 6;
+					maxTileCount = 30;
+					if(!desertChk.isSelected())
+					{
+						maxTileCount = 28;
+					}
 				}
 
-				if(sizeHeadChk.isSelected())
+				//Seafarers
+				if(oceanChk.isSelected())
+				{
+					if(playerChk.isSelected())
+					{
+						outHeight = 7;
+						outWidth = 10;
+						maxTileCount = 80;
+						numberOfOceans = 18;
+						if(!desertChk.isSelected())
+						{
+							maxTileCount = 75;
+						}
+					}
+					else
+					{
+						outHeight = 7;
+						outWidth = 8;
+						maxTileCount = 59;
+						if(!desertChk.isSelected())
+						{
+							maxTileCount = 56;
+						}
+						numberOfOceans = 16;
+					}
+				}
+
+				//Custom size
+				SpreadEvenMap outMap = null;
+				if(sizeChk.isSelected())
 				{
 					try
 					{
@@ -217,52 +326,51 @@ public class MainWindow extends JFrame
 					{
 						errors += "Width too small for height.";
 					}
-				}
 
-				if(errors == "")
-				{
-					if(oceanChk.isSelected())
+					if(errors == "")
 					{
-						if(!sizeHeadChk.isSelected())
+						outMap = new SpreadEvenMap(outHeight, outWidth);
+						if(outMap.getTileCount() > maxTileCount)
 						{
-							if(playerChk.isSelected())
-							{
-								outHeight = 7;
-								outWidth = 10;
-							}
-							else
-							{
-								outHeight = 7;
-								outWidth = 8;
-							}
+							errors = "Not enough tiles available for given size.";
+						}
+						numberOfOceans = outMap.getTileCount() / 3;
+					}
+				}
+				else
+				{
+					if(errors == "")
+					{
+						outMap = new SpreadEvenMap(outHeight, outWidth);
+						if(outMap.getTileCount() > maxTileCount)
+						{
+							errors = "Not enough tiles available for given options.";
 						}
 					}
-					SpreadEvenMap outMap = new SpreadEvenMap(outHeight, outWidth);
+				}
+
+				/////////////////////////////////////
+				// Generate Map 				   //
+				/////////////////////////////////////
+				if(errors == "")
+				{
+					if(outMap == null)
+					{
+						outMap = new SpreadEvenMap(outHeight, outWidth);
+					}
 					if(oceanChk.isSelected())
 					{
-						int numberOfOceans;
-						if(!sizeHeadChk.isSelected())
-						{
-							if(playerChk.isSelected())
-							{
-								numberOfOceans = 18;
-							}
-							else
-							{
-								numberOfOceans = 16;
-							}
-						}
-						else
-						{
-							numberOfOceans = outMap.getTileCount() / 3;
-						}
 						outMap.splitLand(numberOfOceans);
 					}
 					MapNode first = new MapNode(outMap, 0, outMap.getTileCount(), outMap.getTypes());
 					
 					if(desertChk.isSelected())
 					{
-						outMap.placeDesert();
+						int i;
+						for(i = 0; i < desertSld.getValue(); i++)
+						{
+							outMap.placeDesert();
+						}
 					}
 
 					TileWindow tw = new TileWindow(outMap);
@@ -277,6 +385,32 @@ public class MainWindow extends JFrame
 
 		this.pack();
 		this.setVisible(true);
+	}
+
+	/** @brief Updates the maximum for desertSld.
+	 ** @param inSlider The JSlider desertSld.
+	 ** @param inPlayerFlag The return of playerChk.isSelected().
+	 ** @param inOceanFlag The return of oceanChk.isSelected().
+	 ** @return void Returns nothing.
+	 **/
+	void updateDesertSld(JSlider inSlider, boolean inPlayerFlag, boolean inOceanFlag)
+	{
+		//Count max deserts.
+		int desMax = 1;
+		if(inPlayerFlag)
+		{
+			desMax++;
+		}
+		if(inOceanFlag)
+		{
+			desMax += 2;
+			if(inPlayerFlag)
+			{
+				desMax++;
+			}
+		}
+
+		inSlider.setMaximum(desMax);
 	}
 
 	/** @brief Functions to change values of the GridBagConstraints object.
