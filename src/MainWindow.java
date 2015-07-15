@@ -54,7 +54,7 @@ public class MainWindow extends JFrame
 		final JPanel desertPanel = new JPanel();
 			final JSlider desertSld = new JSlider(1, 1, 1);
 			final JLabel desertLbl = new JLabel();
-			final JCheckBox goldChk = new JCheckBox();
+		final JCheckBox goldChk = new JCheckBox();
 		final JPanel goldPanel = new JPanel();
 			final JSlider goldSld = new JSlider(0, 0, 0);
 			final JLabel goldLbl = new JLabel();
@@ -542,7 +542,7 @@ public class MainWindow extends JFrame
 
 			}
 		}
-		typeCountString += "</html";
+		typeCountString += "</html>";
 		inLabel.setText(typeCountString);
 	}
 
