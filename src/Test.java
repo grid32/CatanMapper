@@ -27,7 +27,8 @@ public class Test
 		}
 
 		//Create map
-		Map newMap = new SpreadEvenMap(height, width);
+		int[] tempTypes = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Map newMap = new SpreadEvenMap(height, width, tempTypes);
 
 		//Display map in terminal
 		System.out.println(newMap.tostring());

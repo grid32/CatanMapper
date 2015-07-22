@@ -427,7 +427,7 @@ public class MainWindow extends JFrame
 
 					if(errors == "")
 					{
-						outMap = new SpreadEvenMap(outHeight, outWidth, typeCounts);
+						outMap = new SpreadEvenMap(outHeight, outWidth);
 						if(outMap.getTileCount() > maxTileCount)
 						{
 							errors = "Not enough tiles available for given size.";
@@ -439,7 +439,7 @@ public class MainWindow extends JFrame
 				{
 					if(errors == "")
 					{
-						outMap = new SpreadEvenMap(outHeight, outWidth, typeCounts);
+						outMap = new SpreadEvenMap(outHeight, outWidth);
 						if(outMap.getTileCount() > maxTileCount)
 						{
 							errors = "Not enough tiles available for given options.";
@@ -454,7 +454,21 @@ public class MainWindow extends JFrame
 				{
 					if(outMap == null)
 					{
-						outMap = new SpreadEvenMap(outHeight, outWidth, typeCounts);
+						outMap = new SpreadEvenMap(outHeight, outWidth);
+					}
+					if(oceanChk.isSelected())
+					{
+						outMap.splitLand(numberOfOceans);
+					}
+					MapNode first = new MapNode(outMap, 0, outMap.getTileCount(), outMap.getTypes());
+					
+					if(desertChk.isSelected())
+					{
+						int i;
+						for(i = 0; i < desertSld.getValue(); i++)
+						{
+							outMap.placeDesert();
+						}
 					}
 
 					TileWindow tw = new TileWindow(outMap);

@@ -2,33 +2,23 @@ import java.util.Random;
 
 /** @brief A Map where Tiles with like types are not neighboured.
  ** @details This can be used for vanilla, seafarers, and their 6 player expansions.
- ** @field types A list of the type IDs to be used in the randomisation.
+ ** @field types The array containing the vanilla Tile typeIDs.
  **/
 public class SpreadEvenMap extends Map
 {
-	int[] types = {1, 2, 3, 4, 5, 6, 9}; //List of types so that rand can grab one of these IDs
+	int[] types;
 
 	/** @brief Default constructor for a SpreadEvenMap.
 	 ** @details This generates a SpreadEvenMap of a specified size.
 	 ** @param inHeight The height of the new SpreadEvenMap.
 	 ** @param inWidth The width at the new SpreadEvenMap's widest point.
 	 **/
-	public SpreadEvenMap(int inHeight, int inWidth, int[] inCounts)
+	public SpreadEvenMap(int inHeight, int inWidth)
 	{
 		super(inHeight, inWidth);
 
-		if(inCounts[0] > 0) //Oceans
-		{
-			int remainingOceans = splitLand(inCounts[0]);
-			fillOcean(remainingOceans, inCounts[0]);
-		}
-		if(inCounts[7] > 0 || inCounts[8] > 0) //Explorers
-		{
-			System.out.println("Explorers not yet implemented.");
-		}
-
-		int[] myCounts = {0, 0, 0, 0, 0, 0, 0}; //Wood, Ore, Clay, Sheep, Wheat, Desert, Gold
-		randomise(0, inCounts, myCounts);
+		int[] tempTypes = {1, 2, 3, 4, 5};
+		types = tempTypes;
 	}
 
 	/** @brief Gets the list of typesIDs in use.
@@ -127,7 +117,7 @@ public class SpreadEvenMap extends Map
 	 ** @param oceanCount The number of Tiles to make ocean.
 	 ** @return void Returns nothing.
 	 **/
-	int splitLand(int oceanCount)
+	void splitLand(int oceanCount)
 	{
 		Random rand = new Random();
 		int[] xY = new int[2];
@@ -163,7 +153,7 @@ public class SpreadEvenMap extends Map
 			currentCount++;
 			i++;
 		}
-		return currentCount;
+		tileOcean(currentCount, oceanCount); //Call next part(currentCount, oceanCount);
 	}
 
 	/** @brief Finalises seafarers ocean placement.
@@ -172,7 +162,7 @@ public class SpreadEvenMap extends Map
 	 ** @param oceanCount The number of Tiles to make ocean.
 	 ** @return void Returns nothing.
 	 **/
-	void fillOcean(int currentCount, int oceanCount)
+	void tileOcean(int currentCount, int oceanCount)
 	{
 		Random rand = new Random();
 		int tile = rand.nextInt(getTileCount()); //Start at random point
@@ -198,59 +188,6 @@ public class SpreadEvenMap extends Map
 			xY[0] += xMod;
 			xY[1] += yMod;
 		}
-	}
-
-	void randomise(int currentTileID, int[] inCounts, int[] currentCounts)
-	{
-		int[] xY = getXY(currentTileID);
-		int currentType = getRow(xY[1]).getHex(xY[0]).getTypeID();
-
-		if(currentType == -1)
-		{
-			Random rand = new Random();
-			int randomType, random;
-			boolean possible;
-			do
-			{
-				random = rand.nextInt(7);
-				randomType = types[random];
-				possible = true;
-				int change = rand.nextInt(100)+1;
-				getRow(xY[1]).getHex(xY[0]).setTypeID(randomType);
-				if(change <= checkNeighbours(xY[0], xY[1]))
-				{
-					possible = false;
-				}
-				if(currentCounts[random]+1 > inCounts[randomType])
-				{
-					possible = false;
-				}
-			}
-			while(!possible);
-
-			System.out.println("Set: " + currentTileID);
-			
-			if(currentTileID >= getTileCount() - 1)
-			{e
-				return;
-			}
-			randomise(currentTileID + 1, inCounts, updateCounts(random, currentCounts));
-		}
-		else
-		{
-			if(currentTileID >= getTileCount() - 1)
-			{
-				return;
-			}
-			randomise(currentTileID + 1, inCounts, currentCounts);	
-		}
-	}
-
-	int[] updateCounts(int inID, int[] inCounts)
-	{
-		int[] tempCounts = inCounts;
-		tempCounts[inID]++;
-		return tempCounts;
 	}
 
 	/** @brief Places the desert Tile.
