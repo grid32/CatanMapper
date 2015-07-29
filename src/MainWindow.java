@@ -397,7 +397,7 @@ public class MainWindow extends JFrame
 				}
 
 				//Custom size
-				SpreadEvenMap outMap = null;
+				SpreadMap outMap = null;
 				if(sizeChk.isSelected())
 				{
 					try
@@ -427,7 +427,7 @@ public class MainWindow extends JFrame
 
 					if(errors == "")
 					{
-						outMap = new SpreadEvenMap(outHeight, outWidth, typeCounts);
+						outMap = new SpreadMap(outHeight, outWidth, typeCounts);
 						if(outMap.getTileCount() > maxTileCount)
 						{
 							errors = "Not enough tiles available for given size.";
@@ -439,7 +439,7 @@ public class MainWindow extends JFrame
 				{
 					if(errors == "")
 					{
-						outMap = new SpreadEvenMap(outHeight, outWidth, typeCounts);
+						outMap = new SpreadMap(outHeight, outWidth, typeCounts);
 						if(outMap.getTileCount() > maxTileCount)
 						{
 							errors = "Not enough tiles available for given options.";
@@ -454,10 +454,17 @@ public class MainWindow extends JFrame
 				{
 					if(outMap == null)
 					{
-						outMap = new SpreadEvenMap(outHeight, outWidth, typeCounts);
+						outMap = new SpreadMap(outHeight, outWidth, typeCounts);
 					}
 
-					TileWindow tw = new TileWindow(outMap);
+					if(outMap.getComplete())
+					{
+						TileWindow tw = new TileWindow(outMap);
+					}
+					else
+					{
+						System.out.println("Failed to complete.");
+					}
 				}
 				else
 				{

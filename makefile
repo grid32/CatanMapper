@@ -1,6 +1,6 @@
 SRCDIR=src
 BINDIR=bin
-JAVASRCS=	EvenMap.java MainTest.java MainWindow.java Map.java MapNode.java SpreadEvenMap.java Test.java Tile.java TileRow.java TileTest.java TileWindow.java
+JAVASRCS=	EvenMap.java MainTest.java MainWindow.java Map.java SpreadMap.java Test.java Tile.java TileRow.java TileTest.java TileWindow.java
 
 java:
 	mkdir -p $(BINDIR)

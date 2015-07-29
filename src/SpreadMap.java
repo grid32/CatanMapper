@@ -1,0 +1,308 @@
+import java.util.Random;
+import java.util.Stack;
+
+/** @brief A Map where Tiles with like types are not neighboured.
+ ** @details This can be used for vanilla, seafarers, and their 6 player expansions.
+ ** @field types A list of the type IDs to be used in the randomisation.
+ ** @field complete Whether the map has been completed, including randomise.
+ **/
+public class SpreadMap extends Map
+{
+	int[] types = {1, 2, 3, 4, 5, 6, 9}; //List of types so that rand can grab one of these IDs
+	boolean complete = false;
+
+	/** @brief Default constructor for a SpreadMap.
+	 ** @details This generates a SpreadMap of a specified size.
+	 ** @param inHeight The height of the new SpreadMap.
+	 ** @param inWidth The width at the new SpreadMap's widest point.
+	 **/
+	public SpreadMap(int inHeight, int inWidth, int[] inCounts)
+	{
+		super(inHeight, inWidth);
+
+		if(inCounts[0] > 0) //Oceans
+		{
+			int remainingOceans = splitLand(inCounts[0]);
+			fillOcean(remainingOceans, inCounts[0]);
+		}
+		if(inCounts[7] > 0 || inCounts[8] > 0) //Explorers
+		{
+			System.out.println("Explorers not yet implemented.");
+		}
+
+		int[] myCounts = {0, 0, 0, 0, 0, 0, 0}; //Wood, Ore, Clay, Sheep, Wheat, Desert, Gold
+		complete = randomise(0, inCounts, myCounts);
+	}
+
+	/** @brief Gets the list of typesIDs in use.
+	 ** @return int[] Returns the list of typeIDs.
+	 **/
+	int[] getTypes()
+	{
+		return types;
+	}
+
+	/** @brief Gets whether or not generation is complete.
+	 ** @return boolean Returns the 'complete' field.
+	 **/
+	boolean getComplete()
+	{
+		return complete;
+	}	
+
+	/** @brief Gets the X/Y coordinates of a Tile.
+	 ** @details This is done by iterating through the Map, until a count is reached matching the specified number.
+	 ** @param inIndex The count position of the Tile within the Map.
+	 ** @return int[] Returns the X and Y coordinate of the Tile contained in an array.
+	 **/
+	int[] getXY(int inIndex)
+	{
+		int[] xy = new int[2];
+		int count = 0;
+		for(int y = 0; y < rows.length; y++)
+		{
+			for(int x = 0; x < rows[y].length; x++)
+			{
+				if(count == inIndex)
+				{
+					xy[0] = x;
+					xy[1] = y;
+				}
+				count++;
+			}
+		}
+		return xy;
+	}
+
+	/** @brief Initiates seafarers ocean placement.
+	 ** @details This is done by drawing a jagged ocean line down the center of the Map.
+	 ** @param oceanCount The number of Tiles to make ocean.
+	 ** @return void Returns nothing.
+	 **/
+	int splitLand(int oceanCount)
+	{
+		Random rand = new Random();
+		int[] xY = new int[2];
+		xY[1] = 0;
+		xY[0] = (int) rows[xY[1]].length/2;
+
+		int currentCount = 0;
+		int i = 0;
+		int xMod;
+		while(i < rows.length)
+		{
+			xY[1] = i;
+
+			if(((height + 1) / 2) > i) //Top half
+			{
+				xMod = rand.nextInt(2);
+				while(rows[xY[1]].length - 1 < xY[0] + xMod || xY[0] + xMod < 0)
+				{
+					xMod = rand.nextInt(2);
+				}
+			}
+			else
+			{
+				xMod = rand.nextInt(2) - 1;
+				while(rows[xY[1]].length - 1 < xY[0] + xMod || xY[0] + xMod < 0)
+				{
+					xMod = rand.nextInt(2) - 1;
+				}
+			}
+			xY[0] += xMod;
+			
+			getRow(xY[1]).getHex(xY[0]).setTypeID(0); //Make tile ocean.
+			currentCount++;
+			i++;
+		}
+		return currentCount;
+	}
+
+	/** @brief Finalises seafarers ocean placement.
+	 ** @details This is done by picking a random Tile, making it ocean, and stepping randomly until complete.
+	 ** @param currentCount The number of Tiles already made ocean by splitLand().
+	 ** @param oceanCount The number of Tiles to make ocean.
+	 ** @return void Returns nothing.
+	 **/
+	void fillOcean(int currentCount, int oceanCount)
+	{
+		Random rand = new Random();
+		int tile = rand.nextInt(getTileCount()); //Start at random point
+		int[] xY = getXY(tile);
+
+		while(currentCount < oceanCount)
+		{
+			if(getRow(xY[1]).getHex(xY[0]).getTypeID() != 0)
+			{
+				getRow(xY[1]).getHex(xY[0]).setTypeID(0); //Make tile ocean.
+				currentCount++;
+			}
+			int xMod = rand.nextInt(3)-1;
+			int yMod = rand.nextInt(3)-1;
+			while(rows.length - 1 < xY[1] + yMod || xY[1] + yMod < 0) //Move in random direction.
+			{
+				yMod = rand.nextInt(3)-1;
+			}
+			while(rows[xY[1] + yMod].length - 1 < xY[0] + xMod || xY[0] + xMod < 0)
+			{
+				xMod = rand.nextInt(3)-1;
+			}
+			xY[0] += xMod;
+			xY[1] += yMod;
+		}
+	}
+
+	/** @brief Fills in the land tiles randomly.
+	 ** @details Starting at the top left, moving left to right, top to bottom. This works recursively, and if the current map cannot be completed, steps back to a point where a change can be made, and tries again.
+	 ** @param currentTileID The tile count of where the randomise is up to.
+	 ** @param inCounts The count of tiles available given the current settings of the map.
+	 ** @param currentCounts The count of tiles used thus far in the randomise.
+	 ** @return boolean Returns whether the randomise is successful.
+	 **/
+	boolean randomise(int currentTileID, int[] inCounts, int[] currentCounts)
+	{
+		int[] xY = getXY(currentTileID);
+		int currentType = getRow(xY[1]).getHex(xY[0]).getTypeID();
+
+		if(currentType == -1)
+		{
+			//Make list of types remaining to try
+			Stack<Integer> remainingTypes = new Stack<Integer>();
+			for(int i = 0; i < types.length; i++)
+			{
+				if(currentCounts[i]+1 <= inCounts[types[i]])
+				{
+					remainingTypes.push(types[i]);
+				}
+			}
+			boolean ret = false;
+			Random rand = new Random();
+			int randomType, random;
+			do
+			{
+				//Pick random type
+				do
+				{
+					random = rand.nextInt(7);
+					randomType = types[random];
+				}
+				while(remainingTypes.search(randomType) == -1 && remainingTypes.size() > 0);
+				
+				//Check it fits(neighbours, currentCount)
+				boolean possible = true;
+				int changeChance = checkNeighbours(xY[0], xY[1], randomType);
+				int randChance = rand.nextInt(101);
+				if(changeChance > randChance)
+				{
+					possible = false;
+				}
+
+				if(currentCounts[random]+1 > inCounts[randomType])
+				{
+					possible = false;
+				}
+				remainingTypes.removeElement(randomType); //Remove from remaining
+				if(possible)
+				{
+					getRow(xY[1]).getHex(xY[0]).setTypeID(randomType);
+					//Increment currentCount[type]
+					if(currentTileID >= getTileCount() - 1)
+						return true;
+					else
+					{
+						ret = randomise(currentTileID + 1, inCounts, updateCounts(random, currentCounts));
+					}
+					if(!ret)
+					{
+						//Decrement currentcount[type]
+						getRow(xY[1]).getHex(xY[0]).setTypeID(-1);
+					}
+				}
+			}
+			while(ret == false && remainingTypes.size() > 0);
+			return ret;
+		}
+		else
+		{
+			if(currentTileID >= getTileCount() - 1)
+			{
+				return true;
+			}
+			else
+				return randomise(currentTileID + 1, inCounts, currentCounts);
+		}
+	}
+
+	/** @brief Checks the neighbours of a Tile for likeness.
+	 ** @details This checks the neighbours of a Tile based on the X/Y coordinate given, and decides how much change there should be of changing the specified Tile's typeID.
+	 ** @param inX The X coordinate of the Tile to be compared.
+	 ** @param inY The Y coordinate of the Tile to be compared.
+	 ** @return int Returns the chance of changing the Tile's typeID.
+	 **/
+	int checkNeighbours(int inX, int inY, int myType)
+	{
+		if(myType == -2)
+			myType = rows[inY].getHex(inX).getTypeID();
+		double chance = 75;
+
+		if(inX > 0)
+		{
+			if(rows[inY].getHex(inX - 1).getTypeID() == myType) //Check <
+			{
+				chance *= 1.15;
+			}
+		}
+
+		if(inY > 0)
+		{
+			if((height+1)/2 >= inY + 1) //Top half
+			{
+				if(inX < rows[inY - 1].length)
+				{
+					if(rows[inY - 1].getHex(inX).getTypeID() == myType) //Check ^>
+					{
+						chance *= 1.15;
+					}
+				}
+				if(inX > 0)
+				{
+					if(rows[inY - 1].getHex(inX - 1).getTypeID() == myType) //Check <^
+					{
+						chance *= 1.15;
+					}
+				}
+			}
+			else
+			{
+				if(rows[inY - 1].getHex(inX).getTypeID() == myType) //Check <^
+				{
+					chance *= 1.15;
+				}
+				if(rows[inY - 1].getHex(inX + 1).getTypeID() == myType) //Check ^>
+				{
+					chance *= 1.15;
+				}
+			}
+
+		}
+		
+		if(chance == 75)
+			chance = 0;
+		else
+			chance = 101;
+		return (int) chance;
+	}
+
+	/** @brief Creates an updated copy of the int array.
+	 ** @details This is used during the construction of a random map; making a copy of the array, incrementing the type chosen, and passing it to the next state.
+	 ** @param inID The ID of the type to increment within the array.
+	 ** @param inCounts The array containing the count of tiles used in the current state of randomisation.
+	 ** @return int[] The updated copy of the int array.
+	 **/
+	int[] updateCounts(int inID, int[] inCounts)
+	{
+		int[] tempCounts = inCounts.clone();
+		tempCounts[inID]++;
+		return tempCounts;
+	}
+}
