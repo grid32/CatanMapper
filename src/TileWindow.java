@@ -37,8 +37,8 @@ public class TileWindow extends JFrame
 		map = inMap;
 
 		//Set up textures
-		bi = new BufferedImage[10];
-		String[] texFiles = {"Ocean.png", "Wood.png", "Ore.png", "Clay.png", "Sheep.png", "Wheat.png", "Desert.png", "Sun.png", "Moon.png", "Gold.png"};
+		bi = new BufferedImage[11];
+		String[] texFiles = {"Ocean.png", "Wood.png", "Ore.png", "Clay.png", "Sheep.png", "Wheat.png", "Desert.png", "Sun.png", "Moon.png", "Gold.png", "Council.png"};
 		for(int i = 0; i < bi.length; i++)
 		{
 			String imageURL = "res/" + texFiles[i];

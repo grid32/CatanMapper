@@ -11,6 +11,11 @@ public class SpreadMap extends Map
 	int[] types = {1, 2, 3, 4, 5, 6, 9}; //List of types so that rand can grab one of these IDs
 	boolean complete = false;
 
+	public SpreadMap(int inHeight, int inWidth)
+	{
+		super(inHeight, inWidth);
+	}
+
 	/** @brief Default constructor for a SpreadMap.
 	 ** @details This generates a SpreadMap of a specified size.
 	 ** @param inHeight The height of the new SpreadMap.
@@ -20,14 +25,21 @@ public class SpreadMap extends Map
 	{
 		super(inHeight, inWidth);
 
-		if(inCounts[0] > 0) //Oceans
+		//Explorers
+		if(inCounts[7] > 0 || inCounts[8] > 0)
+		{
+			if(inCounts[10] == 1)
+			{
+				placeCouncil();
+			}
+			fillExplorers(inCounts[7], inCounts[8]);
+		}
+
+		//Seafarers
+		if(inCounts[0] > 0)
 		{
 			int remainingOceans = splitLand(inCounts[0]);
 			fillOcean(remainingOceans, inCounts[0]);
-		}
-		if(inCounts[7] > 0 || inCounts[8] > 0) //Explorers
-		{
-			System.out.println("Explorers not yet implemented.");
 		}
 
 		int[] myCounts = {0, 0, 0, 0, 0, 0, 0}; //Wood, Ore, Clay, Sheep, Wheat, Desert, Gold
@@ -74,6 +86,51 @@ public class SpreadMap extends Map
 		return xy;
 	}
 
+	void placeCouncil()
+	{
+		Random rand = new Random();
+		int[] xY = new int[2];
+
+		xY[1] = rand.nextInt(getHeight());
+		xY[0] = rand.nextInt(rows[xY[1]].length);
+
+		if(getRow(xY[1]).getHex(xY[0]).getTypeID() == -1)
+		{
+			getRow(xY[1]).getHex(xY[0]).setTypeID(10);
+		}
+	}
+
+	void fillExplorers(int inSunsCount, int inMoonsCount)
+	{
+		Random rand = new Random();
+		int[] xY = new int[2];
+
+		xY[1] = rand.nextInt(getHeight());
+		xY[0] = rand.nextInt(rows[xY[1]].length);
+
+		int count = 0;
+		//Place suns
+		while(count < inSunsCount && count < getTileCount())
+		{
+			if(getRow(xY[1]).getHex(xY[0]).getTypeID() == -1)
+			{
+				getRow(xY[1]).getHex(xY[0]).setTypeID(7); //Make tile sun.
+				count++;
+			}
+			moveRandomXY(xY);
+		}
+		//Place moons
+		while(count < (inSunsCount + inMoonsCount) && count < getTileCount())
+		{
+			if(getRow(xY[1]).getHex(xY[0]).getTypeID() == -1)
+			{
+				getRow(xY[1]).getHex(xY[0]).setTypeID(8); //Make tile sun.
+				count++;
+			}
+			moveRandomXY(xY);
+		}
+	}
+
 	/** @brief Initiates seafarers ocean placement.
 	 ** @details This is done by drawing a jagged ocean line down the center of the Map.
 	 ** @param oceanCount The number of Tiles to make ocean.
@@ -89,7 +146,7 @@ public class SpreadMap extends Map
 		int currentCount = 0;
 		int i = 0;
 		int xMod;
-		while(i < rows.length)
+		while(i < rows.length && i < getTileCount())
 		{
 			xY[1] = i;
 
@@ -110,9 +167,11 @@ public class SpreadMap extends Map
 				}
 			}
 			xY[0] += xMod;
-			
-			getRow(xY[1]).getHex(xY[0]).setTypeID(0); //Make tile ocean.
-			currentCount++;
+			if(getRow(xY[1]).getHex(xY[0]).getTypeID() == -1)
+			{
+				getRow(xY[1]).getHex(xY[0]).setTypeID(0); //Make tile ocean.
+				currentCount++;
+			}
 			i++;
 		}
 		return currentCount;
@@ -130,26 +189,38 @@ public class SpreadMap extends Map
 		int tile = rand.nextInt(getTileCount()); //Start at random point
 		int[] xY = getXY(tile);
 
-		while(currentCount < oceanCount)
+		while(currentCount < oceanCount && currentCount < getTileCount())
 		{
-			if(getRow(xY[1]).getHex(xY[0]).getTypeID() != 0)
+			if(getRow(xY[1]).getHex(xY[0]).getTypeID() == -1)
 			{
 				getRow(xY[1]).getHex(xY[0]).setTypeID(0); //Make tile ocean.
 				currentCount++;
 			}
-			int xMod = rand.nextInt(3)-1;
-			int yMod = rand.nextInt(3)-1;
-			while(rows.length - 1 < xY[1] + yMod || xY[1] + yMod < 0) //Move in random direction.
-			{
-				yMod = rand.nextInt(3)-1;
-			}
-			while(rows[xY[1] + yMod].length - 1 < xY[0] + xMod || xY[0] + xMod < 0)
-			{
-				xMod = rand.nextInt(3)-1;
-			}
-			xY[0] += xMod;
-			xY[1] += yMod;
+			xY = moveRandomXY(xY);
 		}
+	}
+
+	/** @brief Randomly steps X and Y.
+	 ** @details Used in filling oceans and explorers.
+	 ** @param inXY An array containing the current X and Y values.
+	 ** @return void Returns the new X and Y values.
+	 **/
+	int[] moveRandomXY(int[] inXY)
+	{
+		Random rand = new Random();
+		int xMod = rand.nextInt(3)-1;
+		int yMod = rand.nextInt(3)-1;
+		while(rows.length - 1 < inXY[1] + yMod || inXY[1] + yMod < 0) //Move in random direction.
+		{
+			yMod = rand.nextInt(3)-1;
+		}
+		while(rows[inXY[1] + yMod].length - 1 < inXY[0] + xMod || inXY[0] + xMod < 0)
+		{
+			xMod = rand.nextInt(3)-1;
+		}
+		inXY[0] += xMod;
+		inXY[1] += yMod;
+		return inXY;
 	}
 
 	/** @brief Fills in the land tiles randomly.

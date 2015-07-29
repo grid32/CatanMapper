@@ -29,7 +29,7 @@ public class MainWindow extends JFrame
 {
 	GridBagConstraints gbc;
 	//Set up default typeCounts
-		int[] typeCounts = {0, 4, 3, 3, 4, 4, 0, 0, 0, 0}; //0:Ocean, 1:Wood, 2:Ore, 3:Clay, 4:Sheep, 5:Wheat, 6:Desert, 7:Suns, 8:Moons, 9:Gold
+		int[] typeCounts = {0, 4, 3, 3, 4, 4, 0, 0, 0, 0, 0}; //0:Ocean, 1:Wood, 2:Ore, 3:Clay, 4:Sheep, 5:Wheat, 6:Desert, 7:Suns, 8:Moons, 9:Gold, 10:Council of Catan.
 
 	/** @brief Default constructor for a MainWindow.
 	 ** @details Draws all of the components for configuring the new Map.
@@ -62,9 +62,9 @@ public class MainWindow extends JFrame
 		final JCheckBox oceanChk = new JCheckBox();
 		final JCheckBox explorersChk = new JCheckBox();
 		final JPanel explorerPanel = new JPanel();
-			final JSlider sunSld = new JSlider(0, 15, 15);
+			final JSlider sunSld = new JSlider(0, 15, 8);
 			final JLabel sunLbl = new JLabel();
-			final JSlider moonSld = new JSlider(0, 15, 15);
+			final JSlider moonSld = new JSlider(0, 15, 8);
 			final JLabel moonLbl = new JLabel();
 		final JLabel typeCountLbl = new JLabel();
 		final JButton generateBtn = new JButton();
@@ -348,11 +348,7 @@ public class MainWindow extends JFrame
 				/////////////////////////////////////
 				int outHeight = 5;
 				int outWidth = 5;
-				int maxTileCount = 19;
-				if(!desertChk.isSelected())
-					{
-						maxTileCount = 18;
-					}
+				int maxTileCount = 18;
 				int numberOfOceans = 0;
 
 				String errors = "";
@@ -362,11 +358,7 @@ public class MainWindow extends JFrame
 				{
 					outHeight = 7;
 					outWidth  = 6;
-					maxTileCount = 30;
-					if(!desertChk.isSelected())
-					{
-						maxTileCount = 28;
-					}
+					maxTileCount = 28;
 				}
 
 				//Seafarers
@@ -376,26 +368,44 @@ public class MainWindow extends JFrame
 					{
 						outHeight = 7;
 						outWidth = 10;
-						maxTileCount = 80;
-						numberOfOceans = 18;
-						if(!desertChk.isSelected())
-						{
-							maxTileCount = 75;
-						}
+						maxTileCount = 35;
+						numberOfOceans = 26;
 					}
 					else
 					{
 						outHeight = 7;
 						outWidth = 8;
-						maxTileCount = 59;
-						if(!desertChk.isSelected())
-						{
-							maxTileCount = 56;
-						}
-						numberOfOceans = 16;
+						maxTileCount = 25;
+						numberOfOceans = 19;
 					}
+					maxTileCount += numberOfOceans;
 				}
 
+				if(desertChk.isSelected())
+				{
+					maxTileCount += desertSld.getValue();
+				}
+
+				if(goldChk.isSelected())
+				{
+					maxTileCount += goldSld.getValue();
+				}
+
+				//Explorers
+				if(explorersChk.isSelected())
+				{
+					if(playerChk.isSelected())
+					{
+						outHeight = 9;
+						outWidth = 11;
+					}
+					else
+					{
+						outHeight = 7;
+						outWidth = 9;
+					}
+					maxTileCount += 1 + sunSld.getValue() + moonSld.getValue();
+				}
 				//Custom size
 				SpreadMap outMap = null;
 				if(sizeChk.isSelected())
@@ -422,27 +432,41 @@ public class MainWindow extends JFrame
 					}
 					if(outWidth - (outHeight - 1)/2 < 1)
 					{
-						errors += "Width too small for height.";
+						errors += "Width too small for height.\n";
+					}
+					if(explorersChk.isSelected())
+					{
+						if(!oceanChk.isSelected())
+						{
+							errors += "Explorers only working with Seafarers.\n";
+						}
 					}
 
 					if(errors == "")
 					{
-						outMap = new SpreadMap(outHeight, outWidth, typeCounts);
+						outMap = new SpreadMap(outHeight, outWidth);
 						if(outMap.getTileCount() > maxTileCount)
 						{
-							errors = "Not enough tiles available for given size.";
+							errors = "Not enough tiles available for given options. Need " + (outMap.getTileCount() - maxTileCount) + " more.";
 						}
 						numberOfOceans = outMap.getTileCount() / 3;
 					}
 				}
 				else
 				{
+					if(explorersChk.isSelected())
+					{
+						if(!oceanChk.isSelected())
+						{
+							errors += "Explorers only working with Seafarers.\n";
+						}
+					}
 					if(errors == "")
 					{
-						outMap = new SpreadMap(outHeight, outWidth, typeCounts);
+						outMap = new SpreadMap(outHeight, outWidth);
 						if(outMap.getTileCount() > maxTileCount)
 						{
-							errors = "Not enough tiles available for given options.";
+							errors = "Not enough tiles available for given options. Need " + (outMap.getTileCount() - maxTileCount) + " more.";
 						}
 					}
 				}
@@ -450,13 +474,11 @@ public class MainWindow extends JFrame
 				/////////////////////////////////////
 				// Generate Map 				   //
 				/////////////////////////////////////
+
 				if(errors == "")
 				{
-					if(outMap == null)
-					{
-						outMap = new SpreadMap(outHeight, outWidth, typeCounts);
-					}
-
+					outMap = new SpreadMap(outHeight, outWidth, typeCounts);
+					
 					if(outMap.getComplete())
 					{
 						TileWindow tw = new TileWindow(outMap);
@@ -486,6 +508,7 @@ public class MainWindow extends JFrame
 	{
 		String typeCountString = "<html>";
 		int i;
+		int total = 0;
 		for(i = 0; i < typeCounts.length; i++)
 		{
 			if(typeCounts[i] != 0)
@@ -523,11 +546,15 @@ public class MainWindow extends JFrame
 					case 9:
 							type = "Gold";
 							break;
+					case 10:
+							type = "Council of Catan";
+							break;
 					default:
 							type = "Undefined";
 							break;
 				}
 				typeCountString += typeCounts[i] + " " + type;
+				total += typeCounts[i];
 				if(typeCounts[i] > 1)
 					typeCountString += " tiles available.<br>";
 				else
@@ -535,7 +562,7 @@ public class MainWindow extends JFrame
 
 			}
 		}
-		typeCountString += "</html>";
+		typeCountString += "<br>" + total + " total tiles.</html>";
 		inLabel.setText(typeCountString);
 	}
 
@@ -552,7 +579,7 @@ public class MainWindow extends JFrame
 	 **/
 	void updateTypeCounts(boolean inDesertFlag, int inDesertVal, boolean inGoldFlag, int inGoldVal, boolean inPlayerFlag, boolean inOceanFlag, boolean inExplorersFlag, int inSunVal, int inMoonVal, JLabel inLabel)
 	{
-		int[] tempCounts = {0, 4, 3, 3, 4, 4, 0, 0, 0, 0}; //0:Ocean, 1:Wood, 2:Ore, 3:Clay, 4:Sheep, 5:Wheat, 6:Desert, 7:Suns, 8:Moons, 9:Gold
+		int[] tempCounts = {0, 4, 3, 3, 4, 4, 0, 0, 0, 0, 0}; //0:Ocean, 1:Wood, 2:Ore, 3:Clay, 4:Sheep, 5:Wheat, 6:Desert, 7:Suns, 8:Moons, 9:Gold, 10:Council of Catan.
 		typeCounts = tempCounts;
 		if(inPlayerFlag)
 		{
@@ -572,7 +599,7 @@ public class MainWindow extends JFrame
 		}
 		if(inOceanFlag)
 		{
-			typeCounts[0] += 19;
+			typeCounts[0] = 19;
 			typeCounts[1] += 1;
 			typeCounts[2] += 2;
 			typeCounts[3] += 2;
@@ -580,13 +607,14 @@ public class MainWindow extends JFrame
 			typeCounts[5] += 1;
 			if(inPlayerFlag)
 			{
-				typeCounts[0] += 7;
+				typeCounts[0] = 26;
 			}
 		}
 		if(inExplorersFlag)
 		{
 			typeCounts[7] += inSunVal;
 			typeCounts[8] += inMoonVal;
+			typeCounts[10] = 1;
 		}
 		changeTypeCountLbl(inLabel);
 		this.pack();
