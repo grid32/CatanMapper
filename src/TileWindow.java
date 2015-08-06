@@ -153,16 +153,20 @@ public class TileWindow extends JFrame
 		g.setColor(Color.BLACK);
 		//g.drawPolygon(x, y, 6);
 
-		int centerX, centerY;
-		centerX = (x[2] + x[0]) / 2;
-		centerY = (y[4] + y[1]) / 2;
-		g.setColor(new Color(245, 237, 184));
-		g.fillOval(centerX-10, centerY-10, 20, 20);
-		g.setColor(Color.BLACK);
-		g.drawOval(centerX-10, centerY-10, 20, 20);
+		//Draw rarity token
+		if(!rarity.equals("-1"))
+		{
+			int centerX, centerY;
+			centerX = (x[2] + x[0]) / 2;
+			centerY = (y[4] + y[1]) / 2;
+			g.setColor(new Color(245, 237, 184));
+			g.fillOval(centerX-10, centerY-10, 20, 20);
+			g.setColor(Color.BLACK);
+			g.drawOval(centerX-10, centerY-10, 20, 20);
 
-		g.drawString(rarity, centerX-5, centerY+5);
+			g.drawString(rarity, centerX-5, centerY+5);
 
-		g.dispose();
+			g.dispose();
+		}
 	}
 }

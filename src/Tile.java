@@ -13,7 +13,7 @@ public class Tile
 	public Tile()
 	{
 		typeID = -1;
-		rarity = 0;
+		rarity = -1;
 	}
 	
 	//Getters

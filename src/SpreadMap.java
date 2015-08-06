@@ -1,5 +1,9 @@
 import java.util.Random;
 import java.util.Stack;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /** @brief A Map where Tiles with like types are not neighboured.
  ** @details This can be used for vanilla, seafarers, and their 6 player expansions.
@@ -44,6 +48,8 @@ public class SpreadMap extends Map
 
 		int[] myCounts = {0, 0, 0, 0, 0, 0, 0}; //Wood, Ore, Clay, Sheep, Wheat, Desert, Gold
 		complete = randomise(0, inCounts, myCounts);
+
+		groupIslands();
 	}
 
 	/** @brief Gets the list of typesIDs in use.
@@ -308,12 +314,11 @@ public class SpreadMap extends Map
 	 ** @details This checks the neighbours of a Tile based on the X/Y coordinate given, and decides how much change there should be of changing the specified Tile's typeID.
 	 ** @param inX The X coordinate of the Tile to be compared.
 	 ** @param inY The Y coordinate of the Tile to be compared.
+	 ** @param myType The Tile's typeID.
 	 ** @return int Returns the chance of changing the Tile's typeID.
 	 **/
 	int checkNeighbours(int inX, int inY, int myType)
 	{
-		if(myType == -2)
-			myType = rows[inY].getHex(inX).getTypeID();
 		double chance = 75;
 
 		if(inX > 0)
@@ -354,7 +359,6 @@ public class SpreadMap extends Map
 					chance *= 1.15;
 				}
 			}
-
 		}
 		
 		if(chance == 75)
@@ -368,12 +372,167 @@ public class SpreadMap extends Map
 	 ** @details This is used during the construction of a random map; making a copy of the array, incrementing the type chosen, and passing it to the next state.
 	 ** @param inID The ID of the type to increment within the array.
 	 ** @param inCounts The array containing the count of tiles used in the current state of randomisation.
-	 ** @return int[] The updated copy of the int array.
+	 ** @return int[] Returns the updated copy of the int array.
 	 **/
 	int[] updateCounts(int inID, int[] inCounts)
 	{
 		int[] tempCounts = inCounts.clone();
 		tempCounts[inID]++;
 		return tempCounts;
+	}
+
+	/** @brief Groups the Tiles by their connectivity.
+	 ** @details This is done by checking neighbouring Tiles to see if they are in landTypes[]. Once grouped, rarities can be given based on island size.
+	 ** @return int[][] Returns a 2D int array, reflecting the layout of the Map, and labelling each Tile with its corresponding island ID.
+	 **/
+	int[][] groupIslands()
+	{
+		String[] landTypes = {"1", "2", "3", "4", "5", "6", "9"};
+		int[][] islands = new int[rows.length][];
+		HashMap<Integer, Integer> sameIDs = new HashMap<Integer, Integer>();
+
+		for(int i = 0; i < rows.length; i++)
+		{
+			islands[i] = new int[rows[i].length];
+		}
+
+		int x = 0;
+		int y = 0;
+
+		//First pass
+		int counter = 0;
+		for(int i = 0; i < getTileCount(); i++)
+		{
+			if(Arrays.asList(landTypes).contains("" + rows[y].getHex(x).getTypeID()))
+			{
+				List<Integer> setIsl = new ArrayList<Integer>();
+
+				setIsl = checkConnectivity(islands, x, y, landTypes);
+
+				if(setIsl.isEmpty())
+				{
+					setIsl.add(counter);
+					counter++;
+				}
+				else
+				{
+					for(int j = 0; j < setIsl.size(); j++)
+					{
+						for(int k = 0; k < setIsl.size(); k++)
+						{
+							if(setIsl.get(j) != setIsl.get(k))
+							{
+								if(sameIDs.get(j) == null)
+								{
+									sameIDs.put(setIsl.get(j), setIsl.get(k));
+								}
+								else if(sameIDs.get(j) < setIsl.get(k))
+								{
+									sameIDs.put(setIsl.get(j), setIsl.get(k));
+								}
+							}
+						}
+					}
+				}
+
+				islands[y][x] = setIsl.get(0);
+				rows[y].getHex(x).setRarity(setIsl.get(0)); //For visualisation
+			}
+			x++;
+			if(x >= islands[y].length)
+			{
+				x = 0;
+				y++;
+			}
+		}
+		////////////
+
+
+		//Second pass
+		x = 0;
+		y = 0;
+
+		for(int i = 0; i < getTileCount(); i++)
+		{
+			if(sameIDs.containsKey(islands[y][x]))
+			{
+				if(sameIDs.get(islands[y][x]) < islands[y][x])
+				{
+					islands[y][x] = sameIDs.get(islands[y][x]);
+					rows[y].getHex(x).setRarity(islands[y][x]); //For visualisation
+				}
+			}
+
+			x++;
+			if(x >= islands[y].length)
+			{
+				x = 0;
+				y++;
+			}
+		}
+		/////////////
+
+		return islands;
+	}
+
+	/** @brief The function which compares neighbouring Tiles' connectivity.
+	 ** @details This is used by the groupIslands() function.
+	 ** @param inIslands A 2D int array, reflecting the layout of the Map, and labelling each Tile with its corresponding island ID at the current state.
+	 ** @param inX The X position of the current Tile in inIslands.
+	 ** @param inY The Y position of the current Tile in inIslands.
+	 ** @param inLandTypes A list of Tile typeIDs which are considered land.
+	 ** @return List Returns a list containing the island ID of any land neighbours.
+	 **/
+	List checkConnectivity(int[][] inIslands, int inX, int inY, String[] inLandTypes)
+	{
+		List<Integer> out = new ArrayList<Integer>();
+
+		if(inY > 0)
+		{
+			if((height+1)/2 >= inY + 1) //Top half
+			{
+				if(inX < rows[inY - 1].length)
+				{
+					if(Arrays.asList(inLandTypes).contains("" + rows[inY - 1].getHex(inX).getTypeID())) //Check ^> 
+					{
+						out.add(inIslands[inY-1][inX]);
+					}
+				}
+				if(inX > 0)
+				{
+					if(Arrays.asList(inLandTypes).contains("" + rows[inY - 1].getHex(inX - 1).getTypeID())) //Check <^ 
+					{
+						out.add(inIslands[inY-1][inX-1]);
+					}
+				}
+			}
+			else
+			{
+				if(Arrays.asList(inLandTypes).contains("" + rows[inY - 1].getHex(inX).getTypeID())) //Check <^
+				{
+					out.add(inIslands[inY-1][inX]);
+				}
+				if(Arrays.asList(inLandTypes).contains("" + rows[inY - 1].getHex(inX + 1).getTypeID())) //Check ^> 
+				{
+					out.add(inIslands[inY-1][inX+1]);
+				}
+			}
+		}
+
+		if(inX > 0)
+		{
+			if(Arrays.asList(inLandTypes).contains("" + rows[inY].getHex(inX - 1).getTypeID())) //Check < 
+			{
+				out.add(inIslands[inY][inX-1]);
+			}
+		}
+
+		return out;
+	}
+
+	//Label rarity based on island size
+	void labelRarity(int[][] inIslands)
+	{
+
 	}
 }
