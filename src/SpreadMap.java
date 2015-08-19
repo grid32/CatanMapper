@@ -49,7 +49,11 @@ public class SpreadMap extends Map
 		int[] myCounts = {0, 0, 0, 0, 0, 0, 0}; //Wood, Ore, Clay, Sheep, Wheat, Desert, Gold
 		complete = randomise(0, inCounts, myCounts);
 
-		groupIslands();
+		int[][] islandsMap = groupIslands();
+		//labelRarity(islandsMap);
+		HashMap<Integer, Integer> currentIslandRarity = new HashMap<Integer, Integer>();
+		boolean success = recurseRarity(0, islandsMap, checkIslandSize(islandsMap), currentIslandRarity);
+		System.out.println(success);
 	}
 
 	/** @brief Gets the list of typesIDs in use.
@@ -400,7 +404,7 @@ public class SpreadMap extends Map
 		int y = 0;
 
 		//First pass
-		int counter = 0;
+		int counter = 1;
 		for(int ii = 0; ii < getTileCount(); ii++)
 		{
 			if(Arrays.asList(landTypes).contains("" + rows[y].getHex(x).getTypeID()))
@@ -461,7 +465,6 @@ public class SpreadMap extends Map
 			}
 		}
 		////////////
-
 
 		//Second pass
 		x = 0;
@@ -545,9 +548,93 @@ public class SpreadMap extends Map
 		return out;
 	}
 
-	//Label rarity based on island size
-	void labelRarity(int[][] inIslands)
+	HashMap<Integer, Integer> checkIslandSize(int[][] inIslandMap)
 	{
+		HashMap<Integer, Integer> islandSize = new HashMap<Integer, Integer>();
 
+		for(int y = 0; y < inIslandMap.length; y++)
+		{
+			for(int x = 0; x < inIslandMap[y].length; x++)
+			{
+				if(islandSize.get(inIslandMap[y][x]) == null)
+				{
+					islandSize.put(inIslandMap[y][x], 1);
+				}
+				else
+				{
+					int current = islandSize.get(inIslandMap[y][x]);
+					islandSize.put(inIslandMap[y][x], current + 1);
+				}
+			}
+		}
+
+		//Remove ocean "island".
+		islandSize.remove(0);
+		
+		return islandSize;
+	}
+
+	//Label rarity based on island size
+	void labelRarity(int[][] inIslandMap)
+	{
+		HashMap<Integer, Integer> islandSize = checkIslandSize(inIslandMap);
+		HashMap<Integer, Integer> islandRarityProgress = new HashMap<Integer, Integer>();
+
+		String[] landTypes = {"1", "2", "3", "4", "5", "9"};
+
+		//Aim for an average of ~ 3 per island.
+		for(int y = 0; y < inIslandMap.length; y++)
+		{
+			for(int x = 0; x < inIslandMap[y].length; x++)
+			{
+				if(Arrays.asList(landTypes).contains("" + rows[y].getHex(x).getTypeID())) //Check ^> 
+				{
+					int myIsland = inIslandMap[y][x];
+					int myIslandSize = islandSize.get(myIsland);
+					Random rand = new Random();
+					double myIslandRatio = (double)myIslandSize/getTileCount();
+					int myRarity;
+					if(myIslandRatio < 0.1)
+					{
+						myRarity = rand.nextInt((int)(3 / myIslandRatio)) + 3;
+					}
+					else
+					{
+						myRarity = rand.nextInt(5) + 1;
+					}
+					if(myRarity > 5)
+					{
+						myRarity = 5;
+					}
+					rows[y].getHex(x).setRarity(myRarity);
+					if(islandRarityProgress.get(myIsland) == null)
+					{
+						islandRarityProgress.put(myIsland, myRarity);
+					}
+					else
+					{
+						islandRarityProgress.put(myIsland, myRarity + islandRarityProgress.get(myIsland));
+					}
+				}
+			}
+		}
+	}
+
+	//Recursive rarity based on island size
+	boolean recurseRarity(int currentCount, int[][] inIslandMap, HashMap<Integer, Integer> inIslandSize, HashMap<Integer, Integer> inCurrentIslandRarity)
+	{
+		//Do stuff
+
+		currentCount++;
+		
+		//Done
+		if(currentCount > getTileCount())
+		{
+			return true;
+		}
+
+		//Recurse
+		boolean result = recurseRarity(currentCount, inIslandMap, inIslandSize, inCurrentIslandRarity);
+		return result;
 	}
 }

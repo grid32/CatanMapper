@@ -34,6 +34,8 @@ public class TileWindow extends JFrame
 	 **/
 	public TileWindow(Map inMap)
 	{
+		this.setTitle("Map");
+
 		map = inMap;
 
 		//Set up textures
@@ -154,7 +156,7 @@ public class TileWindow extends JFrame
 		//g.drawPolygon(x, y, 6);
 
 		//Draw rarity token
-		if(!rarity.equals("-1"))
+		if(!rarity.equals("-1") && typeID != 6)
 		{
 			int centerX, centerY;
 			centerX = (x[2] + x[0]) / 2;
