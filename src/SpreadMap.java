@@ -401,7 +401,7 @@ public class SpreadMap extends Map
 
 		//First pass
 		int counter = 0;
-		for(int i = 0; i < getTileCount(); i++)
+		for(int ii = 0; ii < getTileCount(); ii++)
 		{
 			if(Arrays.asList(landTypes).contains("" + rows[y].getHex(x).getTypeID()))
 			{
@@ -416,19 +416,34 @@ public class SpreadMap extends Map
 				}
 				else
 				{
-					for(int j = 0; j < setIsl.size(); j++)
+					for(int i = 0; i < setIsl.size(); i++)
 					{
-						for(int k = 0; k < setIsl.size(); k++)
+						for(int j = 0; j < setIsl.size(); j++)
 						{
-							if(setIsl.get(j) != setIsl.get(k))
+							int islandI = setIsl.get(i), islandJ = setIsl.get(j);
+							if(islandI != islandJ)
 							{
-								if(sameIDs.get(j) == null)
+								if(sameIDs.get(islandI) != null)
 								{
-									sameIDs.put(setIsl.get(j), setIsl.get(k));
+									if(sameIDs.get(islandI) > islandJ)
+									{
+										sameIDs.put(islandI, islandJ);
+									}
 								}
-								else if(sameIDs.get(j) < setIsl.get(k))
+								else
 								{
-									sameIDs.put(setIsl.get(j), setIsl.get(k));
+									sameIDs.put(islandI, islandJ);
+								}
+								if(sameIDs.get(islandJ) != null)
+								{
+									if(sameIDs.get(islandJ) > islandI)
+									{
+										sameIDs.put(islandJ, islandI);
+									}
+								}
+								else
+								{
+									sameIDs.put(islandJ, islandI);
 								}
 							}
 						}
