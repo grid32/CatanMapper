@@ -156,14 +156,7 @@ public class Map
 	 **/
 	int getTileCount()
 	{
-		int count = 0;
-		for(int y = 0; y < rows.length; y++)
-		{
-			for(int x = 0; x < rows[y].length; x++)
-			{
-				count++;
-			}
-		}
-		return count;
+		//Courtesy of Timothy Peskett - http://www.github.com/TimPeskett
+		return (int) (maxWidth*(height-1) - (Math.pow(height-1, 2)/4) - ((height-1)/2) + maxWidth);
 	}
 }

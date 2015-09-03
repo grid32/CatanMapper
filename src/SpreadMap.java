@@ -43,7 +43,7 @@ public class SpreadMap extends Map
 		if(inCounts[0] > 0)
 		{
 			int remainingOceans = splitLand(inCounts[0]);
-			fillOcean(remainingOceans, inCounts[0]);
+			fillOcean(remainingOceans, inCounts[0], inCounts[7], inCounts[8], inCounts[10]);
 		}
 
 		int[] myCounts = {0, 0, 0, 0, 0, 0, 0}; //Wood, Ore, Clay, Sheep, Wheat, Desert, Gold
@@ -189,13 +189,13 @@ public class SpreadMap extends Map
 	 ** @param oceanCount The number of Tiles to make ocean.
 	 ** @return void Returns nothing.
 	 **/
-	void fillOcean(int currentCount, int oceanCount)
+	void fillOcean(int currentCount, int oceanCount, int inSuns, int inMoons, int inCouncil)
 	{
 		Random rand = new Random();
 		int tile = rand.nextInt(getTileCount()); //Start at random point
 		int[] xY = getXY(tile);
 
-		while(currentCount < oceanCount && currentCount < getTileCount())
+		while(currentCount < oceanCount && (currentCount + (inSuns + inMoons + inCouncil)) < getTileCount())
 		{
 			if(getRow(xY[1]).getHex(xY[0]).getTypeID() == -1)
 			{
@@ -408,6 +408,7 @@ public class SpreadMap extends Map
 				List<Integer> setIsl = new ArrayList<Integer>();
 
 				setIsl = checkConnectivity(islands, x, y, landTypes);
+				System.out.println("    " + setIsl.toString());
 
 				if(setIsl.isEmpty())
 				{
@@ -422,13 +423,21 @@ public class SpreadMap extends Map
 						{
 							if(setIsl.get(j) != setIsl.get(k))
 							{
-								if(sameIDs.get(j) == null)
+								if(sameIDs.get(setIsl.get(j)) == null)
 								{
 									sameIDs.put(setIsl.get(j), setIsl.get(k));
 								}
-								else if(sameIDs.get(j) < setIsl.get(k))
+								if(sameIDs.get(setIsl.get(k)) == null)
+								{
+									sameIDs.put(setIsl.get(k), setIsl.get(j));
+								}
+								if(sameIDs.get(setIsl.get(j)) < setIsl.get(k))
 								{
 									sameIDs.put(setIsl.get(j), setIsl.get(k));
+								}
+								if(sameIDs.get(setIsl.get(k)) < setIsl.get(j))
+								{
+									sameIDs.put(setIsl.get(k), setIsl.get(j));
 								}
 							}
 						}
@@ -447,6 +456,8 @@ public class SpreadMap extends Map
 		}
 		////////////
 
+		System.out.println(sameIDs.toString());
+		// TileWindow tw = new TileWindow(this);
 
 		//Second pass
 		x = 0;
@@ -458,12 +469,23 @@ public class SpreadMap extends Map
 			{
 				if(sameIDs.get(islands[y][x]) < islands[y][x])
 				{
-					islands[y][x] = sameIDs.get(islands[y][x]);
-					rows[y].getHex(x).setRarity(islands[y][x]); //For visualisation
+					//Find any smaller
+					int smallest = sameIDs.get(islands[y][x]);
+					while(smallest > sameIDs.get(smallest))
+					{
+						smallest = sameIDs.get(smallest);
+					}
+					//////////////////
+					islands[y][x] = smallest;
+					rows[y].getHex(x).setRarity(smallest); //For visualisation
 				}
+				x++;
+			}
+			else
+			{
+				x++;
 			}
 
-			x++;
 			if(x >= islands[y].length)
 			{
 				x = 0;

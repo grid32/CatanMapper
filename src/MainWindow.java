@@ -406,8 +406,12 @@ public class MainWindow extends JFrame
 					}
 					maxTileCount += 1 + sunSld.getValue() + moonSld.getValue();
 				}
+
+				//Calculate getTileCount
+				int myTileCount = (int) (outWidth*(outHeight-1) - (Math.pow(outHeight-1, 2)/4) - ((outHeight-1)/2) + outWidth);
+				//Courtesy of Timothy Peskett - http://www.github.com/TimPeskett
+
 				//Custom size
-				SpreadMap outMap = null;
 				if(sizeChk.isSelected())
 				{
 					try
@@ -425,7 +429,10 @@ public class MainWindow extends JFrame
 					catch(Exception x)
 					{
 						errors += "Invalid width.\n";
-					}
+					}		
+
+					myTileCount = (int) (outWidth*(outHeight-1) - (Math.pow(outHeight-1, 2)/4) - ((outHeight-1)/2) + outWidth);
+
 					if(outHeight%2 == 0)
 					{
 						errors += "Height cannot be even.\n";
@@ -444,12 +451,11 @@ public class MainWindow extends JFrame
 
 					if(errors == "")
 					{
-						outMap = new SpreadMap(outHeight, outWidth);
-						if(outMap.getTileCount() > maxTileCount)
+						if(myTileCount > maxTileCount)
 						{
-							errors = "Not enough tiles available for given options. Need " + (outMap.getTileCount() - maxTileCount) + " more.";
+							errors = "Not enough tiles available for given options. Need " + (myTileCount - maxTileCount) + " more.";
 						}
-						numberOfOceans = outMap.getTileCount() / 3;
+						numberOfOceans = myTileCount / 3;
 					}
 				}
 				else
@@ -463,10 +469,9 @@ public class MainWindow extends JFrame
 					}
 					if(errors == "")
 					{
-						outMap = new SpreadMap(outHeight, outWidth);
-						if(outMap.getTileCount() > maxTileCount)
+						if(myTileCount > maxTileCount)
 						{
-							errors = "Not enough tiles available for given options. Need " + (outMap.getTileCount() - maxTileCount) + " more.";
+							errors = "Not enough tiles available for given options. Need " + (myTileCount - maxTileCount) + " more.";
 						}
 					}
 				}
@@ -477,7 +482,7 @@ public class MainWindow extends JFrame
 
 				if(errors == "")
 				{
-					outMap = new SpreadMap(outHeight, outWidth, typeCounts);
+					SpreadMap outMap = new SpreadMap(outHeight, outWidth, typeCounts);
 					
 					if(outMap.getComplete())
 					{
