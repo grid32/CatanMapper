@@ -4,7 +4,7 @@
 public class Tile
 {
 	//Fields
-	int 	typeID; //0:Ocean, 1:Wood, 2:Ore, 3:Clay, 4:Sheep, 5:Wheat 6:Desert
+	int 	typeID; //0:Ocean, 1:Wood, 2:Ore, 3:Clay, 4:Sheep, 5:Wheat 6:Desert 7:Sun 8:Moon 9:Gold 10:Council
 	int 	rarity; //0:{None}, 1:{2,12}, 2:{3,11}, 3:{4,10}, 4:{5,9}, 5:{6,8}
 	
 	/** @brief Default constructor for a Tile.
